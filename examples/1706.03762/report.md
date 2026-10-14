@@ -26,8 +26,8 @@ The paper proposes the Transformer, a sequence transduction architecture based e
 
 | | What is checked | Arithmetic | Result | Paper | Where |
 | --- | --- | --- | --- | --- | --- |
-| ✓ | 28.4, quoted in the abstract, is also printed in the body of the paper | `28.4` | 28.4 | 28.4 | "\| 27.3 \| 38.1 \| \| 3.3·10^18 \| Transformer (big) \| 28.4 \| 41.8 \| \|" |
-| ✓ | 41.8, quoted in the abstract, is also printed in the body of the paper | `41.8` | 41.8 | 41.8 | "\| 38.1 \| \| 3.3·10^18 \| Transformer (big) \| 28.4 \| 41.8 \| \| 2.3\" |
+| ✓ | 28.4, quoted in the abstract, is also printed in the body of the paper | `28.4` | 28.4 | 28.4 | "\| 27.3 \| 38.1 \| \| 3.3·10^(18) \| Transformer (big) \| 28.4 \| 41.8 \| \|" |
+| ✓ | 41.8, quoted in the abstract, is also printed in the body of the paper | `41.8` | 41.8 | 41.8 | "\| 38.1 \| \| 3.3·10^(18) \| Transformer (big) \| 28.4 \| 41.8 \| \| 2.3\" |
 | ✓ | 3.5, quoted in the abstract, is also printed in the body of the paper | `3.5` | 3.5 | 3.5 | "e (ref.)), step time was 1.0 seconds. The big models were trained for 300,000 steps (3.5 days)." |
 | ✓ | Text says base models trained for 100,000 steps or 12 hours with step time 0.4 seconds on 8 GPUs | `100000*0.4/3600` | 11.1111 | 12 | "each training step took about 0.4 seconds. We trained the base models for a total of 100,000 steps or 12 hours." |
 | ✓ | Text says big model uses h=16 attention heads with d_k=d_v=d_model/h=64, Table 3 shows h=16, d_k=64, d_v=64 for big model | `1024/16` | 64 | 64 | "In this work we employ h=8 parallel attention layers, or heads. For each of these we use d_k=d_v=dmodel/h=64." |
@@ -54,7 +54,7 @@ Suggested: Provide a small ablation showing perplexity and BLEU with and without
 
 **2. The parsing experiment uses a 4-layer, d_model=1024 Transformer, differing from both the base (6-layer, 512) and big (6-layer, 1024) translation models, without justification for the architecture change.** (clarity)
 
-> We trained a 4-layer transformer with d_model = 1024 on the Wall Street Journal (WSJ) portion of the Penn Treebank... about 40K training sentences.
+> We trained a 4-layer transformer with d_(model) = 1024 on the Wall Street Journal (WSJ) portion of the Penn Treebank... about 40K training sentences.
 
 Suggested: Explain why a 4-layer model was chosen for parsing, or show that the standard 6-layer base model performs similarly.
 

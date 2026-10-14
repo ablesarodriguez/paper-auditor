@@ -102,6 +102,8 @@ def readable(text) -> str:
     Only for display: quotes are matched against the source as they are, and this does not change them.
     """
     text = re.sub(r"\[T\d+\.R\d+\]\s*\|?\s*", "", str(text))                      # the auditor's own row tags
+    # t^{-1/2} as t^(-1/2), β_{1} as β_1: written so by the paper or by a model describing it
+    text = re.sub(r"([\^_])\{([^{}]*)\}", lambda m: m.group(1) + (m.group(2) if len(m.group(2)) == 1 else f"({m.group(2)})"), text)
     if not re.search(r"[\\$]", text):
         return " ".join(text.split())  # plain text (a transcribed PDF): its braces are the paper's own
     text = re.sub(r"\\multicolumn\{[^{}]*\}\{[^{}]*\}\{((?:[^{}]|\{[^{}]*\})*)\}", r"\1", text)
@@ -111,8 +113,6 @@ def readable(text) -> str:
     text = re.sub(r"\\(?:textbf|textit|emph|mathrm|mathbf|text|boldmath|textsubscript|textsuperscript|num|mathit|operatorname)\b\s*", "", text)
     # a symbol becomes the symbol, layout disappears, and an author's own macro (\dmodel) keeps its name
     text = re.sub(r"\\([A-Za-z]+|%)", lambda m: SYMBOLS.get(m.group(1), "" if m.group(1) in LAYOUT else m.group(1)), text)
-    text = re.sub(r"\^\{([^{}]*)\}", r"^\1", text)
-    text = re.sub(r"_\{([^{}]*)\}", r"_\1", text)
     text = text.replace("$", "").replace("~", " ").replace("{", "").replace("}", "")
     return " ".join(text.split())
 
@@ -290,7 +290,8 @@ def coverage_section(coverage: dict | None, claims: list[dict]) -> list[str]:
              "| Part of the paper | Claims taken from it | What it contains, or why nothing was audited |",
              "| --- | --- | --- |"]
     for s in coverage["sections"]:
-        lines.append(f"| Section: {cell(s['title'])} | {audited(s)} | {why(s)} |")
+        title = re.sub(r"^\d+[.)]\s*", "", readable(s["title"]))  # "1) \quad Introduction" as "Introduction"
+        lines.append(f"| Section: {cell(title)} | {audited(s)} | {why(s)} |")
     for i in coverage["items"]:
         name = f"{'Table' if i['kind'] == 'table' else 'Figure'} {i['id'][1:]}"
         lines.append(f"| {name}: {cell(readable(i['caption'])[:110])} | {audited(i)} | {cell(readable(why(i)))} |")
@@ -360,9 +361,9 @@ def key_findings(audit: dict) -> list[str]:
             found.append(f"**Numbers that disagree:** {readable(c['what'])}: the paper prints {fmt(c['stated'])}, "
                          f"recomputing `{c['expression']}` from its other numbers gives {fmt(float(c['computed']))}.")
     for c in [c for c in reading.get("concerns", []) if c.get("by") == "code"][:2]:
-        found.append(f"**Found by code:** {first_sentence(c['point'])}")
+        found.append(f"**Found by code:** {readable(first_sentence(c['point']))}")
     for c in [c for c in reading.get("concerns", []) if c["severity"] == "major" and c.get("by") != "code"][:3]:
-        found.append(f"**Major concern:** {first_sentence(c['point'])}")
+        found.append(f"**Major concern:** {readable(first_sentence(c['point']))}")
     if checks and not any(not c["consistent"] for c in checks):
         found.append(f"**Numbers consistent:** all {len(checks)} cross-checks of the paper's numbers agree.")
     if claims:
@@ -412,7 +413,7 @@ def write_report(audit: dict, run: Path) -> str:
               "| Claim | Statement | Paper | Obtained | Verdict | Confidence |", "| --- | --- | --- | --- | --- | --- |"]
     for c in claims:
         paper_value = fmt(c["expected_value"]) if c["kind"] == "numeric" else c["expected"]
-        lines.append(f"| {c['id']} | {cell(c.get('summary') or c['statement'])} | {cell(paper_value)} "
+        lines.append(f"| {c['id']} | {cell(readable(c.get('summary') or c['statement']))} | {cell(paper_value)} "
                      f"| {fmt(shown_result(c))} | {cell(verdict_cell(c))} | {CONFIDENCE[c['confidence']]} |")
     lines.append("")
 
@@ -511,7 +512,7 @@ def write_report(audit: dict, run: Path) -> str:
               "the verdict, and the script itself.", ""]
     for c in claims:
         lines += [f"### {c['id']}: {LABELS[c['verdict']]}", "",
-                  f"**Claim.** {c.get('summary') or c['statement']}", ""]
+                  f"**Claim.** {readable(c.get('summary') or c['statement'])}", ""]
         if c.get("approach"):
             lines += [f"**What the script was asked to do.** {c['approach']}", ""]
         lines += [f"**Decision.** {basis(c)}", ""]

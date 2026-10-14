@@ -172,6 +172,21 @@ footer.colophon .wrap { display: flex; justify-content: space-between; gap: 24px
 .doc summary { cursor: pointer; font-weight: 600; color: var(--ink); list-style: none; }
 .doc summary::before { content: "+"; display: inline-block; width: 1.2em; font-family: var(--mono); color: var(--muted); }
 .doc details[open] summary::before { content: "–"; }
+.doc details.script { border: 1px solid var(--ink); padding: 0; background: #fff; }
+.doc details.script summary { padding: 11px 16px; font: 500 .92rem var(--mono); }
+.doc details.script summary:hover { background: var(--paper-2); }
+.doc details.script[open] summary { border-bottom: 1px solid var(--ink); }
+.doc details.script pre { border: 0; margin: 0; max-height: 640px; }
+.codebar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 7px 16px;
+           background: var(--paper-2); border-bottom: 1px solid var(--rule); font: .78rem var(--mono); color: var(--muted); }
+.codebar button { font: 500 .78rem var(--sans); border: 1px solid var(--ink); background: #fff; color: var(--ink);
+                  padding: 3px 10px; margin-left: 6px; cursor: pointer; }
+.codebar button:hover { background: var(--ink); color: var(--paper); }
+.hljs-keyword, .hljs-built_in, .hljs-literal { color: #7a3e9d; }
+.hljs-string { color: var(--green); }
+.hljs-number { color: #a3551a; }
+.hljs-comment { color: var(--muted); font-style: italic; }
+.hljs-title, .hljs-title.function_ { color: #1f5f99; }
 .doc del { color: var(--muted); }
 .doc hr { border: 0; border-top: 1px solid var(--rule); }
 

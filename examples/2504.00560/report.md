@@ -43,7 +43,7 @@ Each concern was argued against before being kept. These were withdrawn, either 
 ## Strengths
 
 - Clear derivation of Lobatto's quadrature with explicit coefficients and proof of exactness for polynomials up to degree five. ("Lobatto's quadrature ((ref.)) is accurate for polynomials up to degree 2 n-3, where n is the number of integration points. In the present case n=4, so the propo")
-- Detailed construction of the discrete Lagrangian for the harmonic oscillator, including explicit elimination of internal degrees of freedom and a rigorous stability analysis yielding a conditional stability bound. ("The internal degrees of freedom q_ξ and q_{1-ξ} are eliminated by solving the system formed by the discrete Euler-Lagrange equations inside the interval, that i")
+- Detailed construction of the discrete Lagrangian for the harmonic oscillator, including explicit elimination of internal degrees of freedom and a rigorous stability analysis yielding a conditional stability bound. ("The internal degrees of freedom q_ξ and q_(1-ξ) are eliminated by solving the system formed by the discrete Euler-Lagrange equations inside the interval, that i")
 - Sixth-order accuracy (superconvergence) demonstrated analytically for the harmonic oscillator and numerically for both the harmonic oscillator and the nonlinear pendulum, with tables showing the expected order of convergence for state, momentum, and energy. ("The method is symplectic and conditionally stable. It uses cubic Lagrange polynomials for its internal interpolation and results to be sixth-order accurate for ")
 
 ## Can it be reproduced from what the paper gives?
@@ -111,13 +111,13 @@ An audit only speaks about results that can be recomputed. Of the 13 parts of th
 
 | Part of the paper | Claims taken from it | What it contains, or why nothing was audited |
 | --- | --- | --- |
-| Section: 1) \quad  Introduction | - | Theory or derivation: the scripts are written from it, but it states no result to compare. Motivates the use of variational principles and symplectic integrators; no numerical results. |
-| Section: 2) \quad  Lobatto's Quadrature | - | Theory or derivation: the scripts are written from it, but it states no result to compare. Derives the Lobatto quadrature coefficients and states its polynomial exactness; no simulation results. |
-| Section: 3) \quad Cubic Interpolation | - | Describes the method: this is what the scripts implement, not a result to compare. Defines the cubic Lagrange basis functions and their derivatives for the finite-element interpolation. |
-| Section: 4) \quad The Harmonic Oscillator Case | C6, C7, C8 (all: reproduced) | Derives the discrete Lagrangian, Euler-Lagrange equations, stability condition, truncation error (sixth-order), symplecticity (det Φ = 1), and discrete energy preservation for the harmonic oscillator. |
-| Section: 5) \quad The Nonlinear Pendulum Case | - | Theory or derivation: the scripts are written from it, but it states no result to compare. Develops the nonlinear Lobatto scheme, discrete Euler-Lagrange equations, and proves symplecticity for the pendulum; no quantitative results. |
-| Section: 6) \quad Numerical Experiments | C1 (reproduced under an assumption), C2 (reproduced), C3 (reproduced under an assumption), C4 (reproduced), C5 (reproduced) | Presents simulation results: Table 1 errors (C1–C4), Figure 2 energy error growth rates (C5), and references Figure 3 and Table 2 (no claims extracted for those). |
-| Section: 5) \quad Conclusions | - | Theory or derivation: the scripts are written from it, but it states no result to compare. Summarizes findings, notes prior publication of linear scheme, and states future work; no new numerical results. |
+| Section: Introduction | - | Theory or derivation: the scripts are written from it, but it states no result to compare. Motivates the use of variational principles and symplectic integrators; no numerical results. |
+| Section: Lobatto's Quadrature | - | Theory or derivation: the scripts are written from it, but it states no result to compare. Derives the Lobatto quadrature coefficients and states its polynomial exactness; no simulation results. |
+| Section: Cubic Interpolation | - | Describes the method: this is what the scripts implement, not a result to compare. Defines the cubic Lagrange basis functions and their derivatives for the finite-element interpolation. |
+| Section: The Harmonic Oscillator Case | C6, C7, C8 (all: reproduced) | Derives the discrete Lagrangian, Euler-Lagrange equations, stability condition, truncation error (sixth-order), symplecticity (det Φ = 1), and discrete energy preservation for the harmonic oscillator. |
+| Section: The Nonlinear Pendulum Case | - | Theory or derivation: the scripts are written from it, but it states no result to compare. Develops the nonlinear Lobatto scheme, discrete Euler-Lagrange equations, and proves symplecticity for the pendulum; no quantitative results. |
+| Section: Numerical Experiments | C1 (reproduced under an assumption), C2 (reproduced), C3 (reproduced under an assumption), C4 (reproduced), C5 (reproduced) | Presents simulation results: Table 1 errors (C1–C4), Figure 2 energy error growth rates (C5), and references Figure 3 and Table 2 (no claims extracted for those). |
+| Section: Conclusions | - | Theory or derivation: the scripts are written from it, but it states no result to compare. Summarizes findings, notes prior publication of linear scheme, and states future work; no new numerical results. |
 | Table 1: Errors in the maximum norm. The Lobatto approximation is sixth-order accurate and preserves a discrete energy. | C1 (reproduced under an assumption), C2 (reproduced), C3 (reproduced under an assumption), C4 (reproduced) | Table of maximum-norm errors for harmonic oscillator (momentum, state, energy, discrete energy) with estimated order 6. |
 | Table 2: Errors in the maximum norm for the nonlinear pendulum simulation. The Lobatto integrator remains a sixth-order | - | Has checkable results that were left out by the limit on claims. Table of maximum-norm errors for nonlinear pendulum (momentum, state, energy) with estimated order 6; no claims extracted for these values. |
 | Figure 1: Harmonic oscillator evolution for the momentum \, p \, and state \, q . Comparison of the Lobatto symplectic s | - | An image: described by a vision model for the review, but with no number to recompute. Plot of harmonic oscillator evolution (momentum and state) for N=3 meshes; visual comparison only. |
@@ -129,10 +129,10 @@ An audit only speaks about results that can be recomputed. Of the 13 parts of th
 
 | Claim | Statement | Paper | Obtained | Verdict | Confidence |
 | --- | --- | --- | --- | --- | --- |
-| C1 | Table tab:errorNorms, row "Momentum $p$": 8.95248e-06, 1.39279e-07, 2.17034e-09 (by Number of meshes: 10, 20, 40) | 8.95248e-06, 1.39279e-07, 2.17034e-09 | 8.95248e-06, 1.39279e-07, 2.17034e-09 | Reproduced under an assumption: `mass_m` = 1 | See warnings |
-| C2 | Table tab:errorNorms, row "State $q$": 7.64034e-07, 1.19368e-08, 1.87641e-10 (by Number of meshes: 10, 20, 40) | 7.64034e-07, 1.19368e-08, 1.87641e-10 | 7.64034e-07, 1.19368e-08, 1.87642e-10 | Reproduced | High |
-| C3 | Table tab:errorNorms, row "Energy $H(p,q)$": 6.61948e-05, 1.09831e-06, 1.69917e-08 (by Number of meshes: 10, 20, 40) | 6.61948e-05, 1.09831e-06, 1.69917e-08 | 6.61948e-05, 1.09831e-06, 1.69917e-08 | Reproduced under an assumption: `mass_m` = 1 | See warnings |
-| C4 | Table tab:errorNorms, row "Discrete energy $H_d(p,q)$": 2.66454e-15, 1.33227e-15, 2.22045e-15 (by Number of meshes: 10, 20, 40) | 2.66454e-15, 1.33227e-15, 2.22045e-15 | 7.10543e-15, 1.5099e-14, 1.11022e-15 | Reproduced | See warnings |
+| C1 | Table tab:errorNorms, row "Momentum p": 8.95248e-06, 1.39279e-07, 2.17034e-09 (by Number of meshes: 10, 20, 40) | 8.95248e-06, 1.39279e-07, 2.17034e-09 | 8.95248e-06, 1.39279e-07, 2.17034e-09 | Reproduced under an assumption: `mass_m` = 1 | See warnings |
+| C2 | Table tab:errorNorms, row "State q": 7.64034e-07, 1.19368e-08, 1.87641e-10 (by Number of meshes: 10, 20, 40) | 7.64034e-07, 1.19368e-08, 1.87641e-10 | 7.64034e-07, 1.19368e-08, 1.87642e-10 | Reproduced | High |
+| C3 | Table tab:errorNorms, row "Energy H(p,q)": 6.61948e-05, 1.09831e-06, 1.69917e-08 (by Number of meshes: 10, 20, 40) | 6.61948e-05, 1.09831e-06, 1.69917e-08 | 6.61948e-05, 1.09831e-06, 1.69917e-08 | Reproduced under an assumption: `mass_m` = 1 | See warnings |
+| C4 | Table tab:errorNorms, row "Discrete energy H_d(p,q)": 2.66454e-15, 1.33227e-15, 2.22045e-15 (by Number of meshes: 10, 20, 40) | 2.66454e-15, 1.33227e-15, 2.22045e-15 | 7.10543e-15, 1.5099e-14, 1.11022e-15 | Reproduced | See warnings |
 | C5 | Over 1e5 periods of the harmonic oscillator, the ℓ^∞ energy error growth rate for the Lobatto scheme is 2.50e-11 for h=0.1, 5.45e-14 for h=0.05, and 1.35e-13 for h=0.025. | 2.5e-11, 5.45e-14, 1.35e-13 | 2.51388e-11, 9.88474e-17, 1.10584e-13 | Reproduced | See warnings |
 | C6 | The Lobatto scheme for the harmonic oscillator is conditionally stable for hω < sqrt(42 - 6*sqrt(29)) (approximately π). | 3.11272 | 3.11272 | Reproduced | High |
 | C7 | The discrete flow map Φ of the Lobatto scheme for the harmonic oscillator has determinant exactly 1, making the scheme symplectic. | 1 | 1 | Reproduced | High |
@@ -225,7 +225,7 @@ For every claim: what was asked, what the generated script did, the rule that pr
 
 ### C1: Reproduced under an assumption
 
-**Claim.** Table tab:errorNorms, row "Momentum $p$": 8.95248e-06, 1.39279e-07, 2.17034e-09 (by Number of meshes: 10, 20, 40)
+**Claim.** Table tab:errorNorms, row "Momentum p": 8.95248e-06, 1.39279e-07, 2.17034e-09 (by Number of meshes: 10, 20, 40)
 
 **What the script was asked to do.** Simulate the harmonic oscillator using the Lobatto symplectic scheme (equations symplecticSystem and symplecticCoeffs) with step sizes h=0.1, 0.05, 0.025 (N=10,20,40) over one period T=1. Initial conditions: q(0)=π/2, p(0)=0. Parameters: ω=2π, mass m (from assumption). Compute the numerical solution at each time step. The exact momentum is p_exact(t) = -π/2 m ω sin(ω t). Compute the maximum absolute error (ℓ∞ norm) between numerical and exact momentum over the period. Repeat for each h.
 
@@ -298,7 +298,7 @@ report(obtained, detail)
 
 ### C2: Reproduced
 
-**Claim.** Table tab:errorNorms, row "State $q$": 7.64034e-07, 1.19368e-08, 1.87641e-10 (by Number of meshes: 10, 20, 40)
+**Claim.** Table tab:errorNorms, row "State q": 7.64034e-07, 1.19368e-08, 1.87641e-10 (by Number of meshes: 10, 20, 40)
 
 **What the script was asked to do.** Simulate the harmonic oscillator using the Lobatto symplectic scheme (equations symplecticSystem and symplecticCoeffs) with step sizes h=0.1, 0.05, 0.025 (N=10,20,40) over one period T=1. Initial conditions: q(0)=π/2, p(0)=0. Parameters: ω=2π, mass m (from assumption). Compute the numerical solution at each time step. The exact state is q_exact(t) = π/2 cos(ω t). Compute the maximum absolute error (ℓ∞ norm) between numerical and exact state over the period. Repeat for each h.
 
@@ -382,7 +382,7 @@ if __name__ == "__main__":
 
 ### C3: Reproduced under an assumption
 
-**Claim.** Table tab:errorNorms, row "Energy $H(p,q)$": 6.61948e-05, 1.09831e-06, 1.69917e-08 (by Number of meshes: 10, 20, 40)
+**Claim.** Table tab:errorNorms, row "Energy H(p,q)": 6.61948e-05, 1.09831e-06, 1.69917e-08 (by Number of meshes: 10, 20, 40)
 
 **What the script was asked to do.** Simulate the harmonic oscillator using the Lobatto symplectic scheme (equations symplecticSystem and symplecticCoeffs) with step sizes h=0.1, 0.05, 0.025 (N=10,20,40) over one period T=1. Initial conditions: q(0)=π/2, p(0)=0. Parameters: ω=2π, mass m (from assumption). Compute the numerical solution at each time step. The continuous energy is H(p,q) = p^2/(2m) + 1/2 m ω^2 q^2. The exact energy is constant: H_exact = 1/2 m ω^2 (π/2)^2. Compute the maximum absolute error (ℓ∞ norm) between numerical H and H_exact over the period. Repeat for each h.
 
@@ -466,7 +466,7 @@ report(errors, detail)
 
 ### C4: Reproduced
 
-**Claim.** Table tab:errorNorms, row "Discrete energy $H_d(p,q)$": 2.66454e-15, 1.33227e-15, 2.22045e-15 (by Number of meshes: 10, 20, 40)
+**Claim.** Table tab:errorNorms, row "Discrete energy H_d(p,q)": 2.66454e-15, 1.33227e-15, 2.22045e-15 (by Number of meshes: 10, 20, 40)
 
 **What the script was asked to do.** Simulate the harmonic oscillator using the Lobatto symplectic scheme (equations symplecticSystem and symplecticCoeffs) with step sizes h=0.1, 0.05, 0.025 (N=10,20,40) over one period T=1. Initial conditions: q(0)=π/2, p(0)=0. Parameters: ω=2π, mass m (from assumption). Compute the numerical solution at each time step. The discrete energy is H_d(p,q) = c/(2δ̃) p^2 - b/(2δ̃) q^2, where coefficients a,b,c,δ̃ are given in eq:symplecticCoeffs. Compute H_d at each step and find the maximum absolute deviation from its initial value (or from the exact discrete energy, which is constant) over the period. Repeat for each h.
 

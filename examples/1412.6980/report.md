@@ -4,7 +4,7 @@ This report does what a referee does. First it reads the paper: what it claims, 
 
 ## Key findings
 
-- **Major concern:** The theoretical analysis (Theorem 4.1) assumes a decaying learning rate α_t ∝ t^{-1/2} and a decaying first-moment coefficient β_{1,t} = β₁ λ^{t-1}, but the presented algorithm (Algorithm 1) uses constant β₁, β₂ and …
+- **Major concern:** The theoretical analysis (Theorem 4.1) assumes a decaying learning rate α_t ∝ t^(-1/2) and a decaying first-moment coefficient β_(1,t) = β₁ λ^(t-1), but the presented algorithm (Algorithm 1) uses constant β₁, β₂ and …
 - **Major concern:** The derivation of the expected second moment (Equation 3–4) introduces an undefined term ζ and uses β₁ in the explanation of the second-moment bias, creating confusion between the two decay rates.
 
 *Each point is detailed below with its evidence.*
@@ -19,9 +19,9 @@ No reported results were found that can be checked against other numbers the pap
 
 ## Major concerns
 
-**1. The theoretical analysis (Theorem 4.1) assumes a decaying learning rate α_t ∝ t^{-1/2} and a decaying first-moment coefficient β_{1,t} = β₁ λ^{t-1}, but the presented algorithm (Algorithm 1) uses constant β₁, β₂ and constant α. The theorem therefore does not directly apply to the algorithm as written.** (soundness)
+**1. The theoretical analysis (Theorem 4.1) assumes a decaying learning rate α_t ∝ t^(-1/2) and a decaying first-moment coefficient β_(1,t) = β₁ λ^(t-1), but the presented algorithm (Algorithm 1) uses constant β₁, β₂ and constant α. The theorem therefore does not directly apply to the algorithm as written.** (soundness)
 
-> Our following theorem holds when the learning rate α_t is decaying at a rate of t^-frac12 and first moment running average coefficient β_1,t decay exponentially with λ, that is typically close to 1, e.g. 1 - 10^-8.
+> Our following theorem holds when the learning rate α_t is decaying at a rate of t^-frac12 and first moment running average coefficient β_(1,t) decay exponentially with λ, that is typically close to 1, e.g. 1 - 10^(-8).
 
 Suggested: Either modify the algorithm to match the theoretical assumptions (e.g., schedule β₁ and α) or re-state the theorem for the constant-parameter version used in experiments.
 
@@ -55,7 +55,7 @@ Suggested: Add a dedicated limitations section acknowledging where Adam may unde
 
 Each concern was argued against before being kept. These were withdrawn, either because a passage of the paper answers them or because a second reading found them not to hold:
 
-- ~~The AdaMax derivation parameterizes the decay as β₂^p and then takes p → ∞, but β₂^p → 0 for any β₂ ∈ [0,1), making the limit degenerate and the connection to the original β₂ unclear.~~ Two models reading the paper again both found: The referee claims the limit pto∞ is degenerate because β_2^pto0, but the paper derives a well-defined, non-degenerate limit (Equation 11) that yields the simple recursive formula u_t = max(β_2 u_t-1, |g_t|).
+- ~~The AdaMax derivation parameterizes the decay as β₂^p and then takes p → ∞, but β₂^p → 0 for any β₂ ∈ [0,1), making the limit degenerate and the connection to the original β₂ unclear.~~ Two models reading the paper again both found: The referee claims the limit pto∞ is degenerate because β_2^pto0, but the paper derives a well-defined, non-degenerate limit (Equation 11) that yields the simple recursive formula u_t = max(β_2 u_(t-1), |g_t|).
 
 ## Strengths
 
@@ -106,7 +106,7 @@ Each figure was cut out of the PDF and described by a vision model, so that the 
 
 ## Questions for the authors
 
-1. The theoretical regret bound assumes decaying β_{1,t} and α_t, but the algorithm uses constant values. How should practitioners reconcile this discrepancy, and does the bound hold for the constant-parameter version?
+1. The theoretical regret bound assumes decaying β_(1,t) and α_t, but the algorithm uses constant values. How should practitioners reconcile this discrepancy, and does the bound hold for the constant-parameter version?
 2. In the AdaMax derivation, the decay term is written as β₂^p and then p → ∞ is taken. Since β₂^p → 0, the effective memory horizon collapses; can you clarify the intended parameterization and the limit?
 3. The experiments report only single-run trajectories. Can you provide results averaged over multiple random seeds with error bars to support the claim that Adam 'consistently outperforms other methods'?
 4. The paper states hyperparameters 'typically require little tuning' but also describes a dense grid search. Can you show performance across a reasonable hyperparameter range without per-dataset tuning?

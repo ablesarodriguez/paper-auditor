@@ -55,7 +55,7 @@ Suggested: Note that the full-precision values are available upon request, or pr
 
 Each concern was argued against before being kept. These were withdrawn, either because a passage of the paper answers them or because a second reading found them not to hold:
 
-- ~~The double-approximation procedure uses ambiguous notation: P_{(n+1)} in equation (13) could refer to the forward-difference estimate (9) or the centered-difference estimate (10), and the derivation of equation (14) from (9) and (10) is not clearly explained.~~ Two models reading the paper again both found: The concern misidentifies equation (10) as the centered-difference estimate; the paper defines P_{(n+1)} using the forward-difference estimate (9) and the centered-difference procedure is given separately in equation (12).
+- ~~The double-approximation procedure uses ambiguous notation: P_((n+1)) in equation (13) could refer to the forward-difference estimate (9) or the centered-difference estimate (10), and the derivation of equation (14) from (9) and (10) is not clearly explained.~~ Two models reading the paper again both found: The concern misidentifies equation (10) as the centered-difference estimate; the paper defines P_((n+1)) using the forward-difference estimate (9) and the centered-difference procedure is given separately in equation (12).
 - ~~The time step Δt used in the numerical integration is never specified, making it impossible to assess the accuracy of the integration or to reproduce the results.~~ Two models reading the paper again both found: The paper specifies the dimensionless time step Δτ=0.01, contrary to the referee's claim that it is never specified.
 
 ## Strengths
@@ -112,7 +112,7 @@ Each figure was cut out of the PDF and described by a vision model, so that the 
 
 1. What is the time step Δt used in the numerical integration, and how was it chosen?
 2. Were any other initial conditions or parameter values explored to support the claim that 'all solutions are unstable'?
-3. Can the double-approximation procedure be clarified: does P_{(n+1)} in equation (13) refer to the forward-difference estimate (9) or the centered-difference estimate (10)?
+3. Can the double-approximation procedure be clarified: does P_((n+1)) in equation (13) refer to the forward-difference estimate (9) or the centered-difference estimate (10)?
 4. The paper dismisses noncentral stable nonperiodic trajectories as not characteristic of real hydrodynamical phenomena. What is the basis for this physical intuition?
 5. How does the truncation of output values (multiplying by 10 and taking integer part) affect the interpretation of the numerical results, especially for small values?
 
