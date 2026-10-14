@@ -102,6 +102,10 @@ def readable(text) -> str:
     Only for display: quotes are matched against the source as they are, and this does not change them.
     """
     text = re.sub(r"\[T\d+\.R\d+\]\s*\|?\s*", "", str(text))                      # the auditor's own row tags
+    # LaTeX fractions as a/b
+    text = re.sub(r"\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}|\\[dt]?frac\s*(\w)(\w)",
+                  lambda m: "/".join(x if len(x) == 1 or x.isalnum() else f"({x})" for x in
+                                     (m.group(1, 2) if m.group(1) is not None else m.group(3, 4))), text)
     # t^{-1/2} as t^(-1/2), β_{1} as β_1: written so by the paper or by a model describing it
     text = re.sub(r"([\^_])\{([^{}]*)\}", lambda m: m.group(1) + (m.group(2) if len(m.group(2)) == 1 else f"({m.group(2)})"), text)
     if not re.search(r"[\\$]", text):
@@ -170,7 +174,7 @@ def review_section(reading: dict | None, related: dict | None = None, figures: d
                  if len(checks) - tables - echoed else ""]
         lines += ["## Do the paper's numbers agree with each other?", "",
                   f"{len(checks)} results printed in the paper were checked against other numbers it prints: "
-                  + "; ".join(p for p in parts if p) + f". All arithmetic is done by code. **{len(wrong)} do not agree.**", ""]
+                  + "; ".join(p for p in parts if p) + f". All arithmetic is done by code. **{len(wrong)} {'does' if len(wrong) == 1 else 'do'} not agree.**", ""]
         if wrong:
             lines += head + rows(wrong) + [""]
         right = [c for c in checks if c["consistent"]]

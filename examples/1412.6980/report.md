@@ -21,7 +21,7 @@ No reported results were found that can be checked against other numbers the pap
 
 **1. The theoretical analysis (Theorem 4.1) assumes a decaying learning rate α_t ∝ t^(-1/2) and a decaying first-moment coefficient β_(1,t) = β₁ λ^(t-1), but the presented algorithm (Algorithm 1) uses constant β₁, β₂ and constant α. The theorem therefore does not directly apply to the algorithm as written.** (soundness)
 
-> Our following theorem holds when the learning rate α_t is decaying at a rate of t^-frac12 and first moment running average coefficient β_(1,t) decay exponentially with λ, that is typically close to 1, e.g. 1 - 10^(-8).
+> Our following theorem holds when the learning rate α_t is decaying at a rate of t^(-1/2) and first moment running average coefficient β_(1,t) decay exponentially with λ, that is typically close to 1, e.g. 1 - 10^(-8).
 
 Suggested: Either modify the algorithm to match the theoretical assumptions (e.g., schedule β₁ and α) or re-state the theorem for the constant-parameter version used in experiments.
 

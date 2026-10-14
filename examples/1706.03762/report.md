@@ -15,7 +15,7 @@ The paper proposes the Transformer, a sequence transduction architecture based e
 
 ## Do the paper's numbers agree with each other?
 
-6 results printed in the paper were checked against other numbers it prints: 4 numbers of the abstract, compared with the body; 2 relations between numbers pointed out by the model. All arithmetic is done by code. **1 do not agree.**
+6 results printed in the paper were checked against other numbers it prints: 4 numbers of the abstract, compared with the body; 2 relations between numbers pointed out by the model. All arithmetic is done by code. **1 does not agree.**
 
 | | What is checked | Arithmetic | Result | Paper | Where |
 | --- | --- | --- | --- | --- | --- |
