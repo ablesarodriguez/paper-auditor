@@ -23,6 +23,9 @@ load_dotenv()
 
 BASE_URL = "https://api.tokenfactory.nebius.com/v1/"
 SPEND_CAP_USD = float(os.getenv("SPEND_CAP_USD", "35"))
+# Token Factory bills VAT on top of the token prices (21% in Spain). With VAT_RATE set, every cost
+# counted, and so the cap, is what is actually charged; at 0 they are the prices before tax.
+VAT_RATE = float(os.getenv("VAT_RATE", "0"))
 LEDGER = Path(".spend.json")
 MAX_OUTPUT_TOKENS = 24000  # includes the reasoning tokens of the Nemotron models
 
@@ -132,7 +135,7 @@ def complete(role: str, messages: list[dict], **kwargs) -> tuple[str, bool]:
         started = time.monotonic()
         response = client().chat.completions.create(model=model, messages=messages, **kwargs)
         usage = response.usage
-        cost = (usage.prompt_tokens * price_in + usage.completion_tokens * price_out) / 1e6
+        cost = (usage.prompt_tokens * price_in + usage.completion_tokens * price_out) / 1e6 * (1 + VAT_RATE)
         with _ledger_lock:
             LEDGER.write_text(json.dumps({"usd": spent() + cost}))
             session_cost[role] = session_cost.get(role, 0.0) + cost

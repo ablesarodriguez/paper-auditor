@@ -10,6 +10,7 @@ a day, until a reserve of the spending cap is reached.
 import datetime
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -31,6 +32,9 @@ NEW_PER_SESSION = int(os.getenv("DEMO_NEW_PER_SESSION", "2"))  # new papers per 
 RESERVE_USD = float(os.getenv("DEMO_RESERVE_USD", "1.0"))      # never spend the last dollars of the cap
 MAX_PAGES = int(os.getenv("DEMO_MAX_PAGES", "25"))              # a PDF is transcribed page by page: cost grows with it
 USAGE = ROOT / ".demo_usage.json"
+MODEL_CALL = re.compile(r"(\w+): (\d+) in / (\d+) out = \$([\d.]+)")  # as auditor.llm logs each call
+MODEL_NAMES = {"ultra": "Nemotron 3 Ultra", "super": "Nemotron 3 Super", "nano": "Nemotron 3 Nano",
+               "vision": "MiniCPM-V"}
 _usage_lock = threading.Lock()
 
 INTRO = """# Paper Reproducibility Auditor
@@ -192,8 +196,11 @@ def audit(pdf, arxiv_id, max_claims, data=None, review_only=False, session_count
         env={**os.environ, "PYTHONIOENCODING": "utf-8"})
     log = []
     for line in process.stdout:
-        if " in / " in line:  # one line per model call: too noisy for the page
-            continue
+        call = MODEL_CALL.search(line)
+        if call:  # one line per model call, said in words: which model, through what, how much
+            role, tokens_in, tokens_out, usd = call.groups()
+            line = (f"  {MODEL_NAMES.get(role, role)} via Nebius Token Factory: {int(tokens_in):,} tokens in, "
+                    f"{int(tokens_out):,} out (${float(usd):.3f})")
         log.append(line.rstrip())
         yield "\n".join(log[-400:]), "", None, session_count
     process.wait()
@@ -207,7 +214,10 @@ def audit(pdf, arxiv_id, max_claims, data=None, review_only=False, session_count
     yield "\n".join(log[-400:]), report.read_text(encoding="utf-8"), [str(report), str(run / "audit.json")], session_count
 
 
-with gr.Blocks(title="Paper Reproducibility Auditor") as page:
+# Report tables: a number or a short label is never split across lines ("41." over "0").
+CSS = ".prose table td, .prose table th { word-break: normal; overflow-wrap: normal; }"
+
+with gr.Blocks(title="Paper Reproducibility Auditor", css=CSS) as page:
     gr.Markdown(INTRO)
     if DEMO:
         gr.Markdown(DEMO_NOTE)
@@ -239,7 +249,7 @@ with gr.Blocks(title="Paper Reproducibility Auditor") as page:
         gr.Markdown("Without the data, results that depend on it cannot be checked: the method is still rebuilt from "
                     "the paper and run on substitute data, which tests how it behaves, not the numbers the paper "
                     "reports. Keep the file names the paper uses.")
-    progress = gr.Textbox(label="Progress", lines=4, max_lines=12, autoscroll=True)
+    progress = gr.Textbox(label="Progress", lines=4, max_lines=14, autoscroll=True)
     report = gr.Markdown(label="Audit report")
     files = gr.File(label="Download the report and the full audit data", file_count="multiple")
     open_example.click(show, inputs=[choice], outputs=[progress, report, files])
@@ -250,5 +260,6 @@ with gr.Blocks(title="Paper Reproducibility Auditor") as page:
 
 if __name__ == "__main__":
     # One audit at a time: they share the budget and the machine.
-    page.queue(default_concurrency_limit=1).launch(server_name=os.getenv("HOST", "127.0.0.1"),
-                                                   server_port=int(os.getenv("GRADIO_SERVER_PORT", "7860")))
+    # PORT is how hosting services (Render) say where to listen
+    port = int(os.getenv("PORT") or os.getenv("GRADIO_SERVER_PORT", "7860"))
+    page.queue(default_concurrency_limit=1).launch(server_name=os.getenv("HOST", "127.0.0.1"), server_port=port)

@@ -81,12 +81,13 @@ numbers correctly (it missed 36 + 29 − 62 = 3 solar masses in LIGO).
 ### Measured
 
 `python tools/evaluate.py` plants errors in copies of the papers audited so
-far and counts how many the checks made by code catch. On nine papers (six
-LaTeX sources, two PDFs, one scan): 108 errors planted, 108 caught, across
+far and counts how many the checks made by code catch. On eleven papers
+(eight LaTeX sources, two PDFs, one scan): 133 errors planted, 132 caught, across
 table averages and totals, abstract results the body does not print, a result
 printed with two values, percentages that do not match their counts, undefined
-references and missing bibliography entries. On the unmodified papers, the
-only flags are two real problems of those papers. The full table and its
+references and missing bibliography entries; the one missed is a planted value
+the paper happens to print elsewhere in the same context. On the unmodified
+papers, the only flags are two real problems of those papers. The full table and its
 limits are in [evaluation.md](evaluation.md): the errors were planted by the
 author of the checks, and the parts of the review written by models are not
 measured there.
@@ -203,14 +204,13 @@ protection:
   and none is accepted once spending is within `DEMO_RESERVE_USD` (1.0) of
   `SPEND_CAP_USD`. Data uploads are off. Audits run one at a time.
 
-To publish it for free on Hugging Face Spaces: create a Space with the Gradio
-SDK, push this repository to it, and add at the top of the Space's README the
-lines `---`, `sdk: gradio`, `app_file: app.py`, `---`. In the Space's settings,
-add the secrets `NEBIUS_API_KEY` and `TAVILY_API_KEY` and the variables
-`DEMO_MODE=1`, `HOST=0.0.0.0` and `SPEND_CAP_USD` set to what the demo may
-spend (the Space keeps its own ledger, which starts at zero and is reset when
-the Space restarts). A free Space sleeps after two days without visits and
-wakes up, in about a minute, on the next one.
+To publish it for free on Render: sign in at render.com with GitHub, choose
+"New > Blueprint" and pick this repository. `render.yaml` sets everything up;
+Render asks for `NEBIUS_API_KEY` and `TAVILY_API_KEY` and keeps them. The
+demo spends at most `SPEND_CAP_USD` (5 by default, VAT included through
+`VAT_RATE=0.21`), counted from zero on Render and reset when the service
+restarts. A free service sleeps after 15
+minutes without visits and wakes up, in about a minute, on the next one.
 
 To see the page as a visitor does, `python tools/look.py [--demo] [--example
 "Attention"]` starts it, opens it in a headless browser, opens an example

@@ -1,0 +1,24 @@
+# The public demo on Render's free plan: https://render.com (sign in with GitHub, "New > Blueprint",
+# pick this repository). The two API keys are asked for at creation and stay in Render, not here.
+services:
+  - type: web
+    name: paper-auditor
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: DEMO_MODE
+        value: "1"
+      - key: HOST
+        value: "0.0.0.0"
+      - key: SPEND_CAP_USD        # what the demo may spend, VAT included; its ledger starts at zero on Render
+        value: "5"
+      - key: VAT_RATE             # Token Factory adds VAT to the token prices: count what is really charged
+        value: "0.21"
+      - key: NEBIUS_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false

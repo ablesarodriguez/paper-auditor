@@ -438,11 +438,15 @@ def table_checks(latex: str, rows: dict | None = None) -> list[dict]:
         table = tag.split(".")[0]
         headers = [r["cells"] for t, r in rows.items() if t.split(".")[0] == table
                    and int(t.split("R")[1]) < int(tag.split("R")[1])
-                   and any(AGGREGATE.match(c) for c in r["cells"])]
+                   and any(AGGREGATE.match(plain(c)) for c in r["cells"])]
         if not headers or len(headers[-1]) != len(row["cells"]):
             continue
         header = headers[-1]
-        column = next(i for i, c in enumerate(header) if AGGREGATE.match(c))
+        column = next(i for i, c in enumerate(header) if AGGREGATE.match(plain(c)))
+        # A cell holding two values ("88.2/87.9", MNLI matched/mismatched) says the average is taken over
+        # metrics the table does not all show (as GLUE's is): it cannot be recomputed from the cells.
+        if any(re.search(r"\d\s*/\s*\d", c) for c in row["cells"][1:column]):
+            continue
         stated = cell_number(row["cells"][column])
         run = []
         for i in range(column - 1, -1, -1):
@@ -627,6 +631,42 @@ def restated_differently(abstract: str, body: str) -> list[dict]:
     return found
 
 
+def derivation(value: float, token: str, sentence: str, body: str, rows: dict) -> str:
+    """How an abstract number not printed in the body follows from printed ones, or ''.
+
+    An improvement quoted beside a result ("80.5% (7.7 point absolute improvement)") is the difference
+    between that result and the baseline the paper compares it with. The baseline is looked for where a
+    paper puts it: in the same column of the table that prints the result, or within a few sentences of
+    the result in the text. A paper prints hundreds of numbers, and differences taken across all of them
+    would explain any value by coincidence.
+    """
+    # only a number the abstract words as a difference: "7.7% point absolute improvement", "+2.0 BLEU over"
+    at = sentence.find(token)
+    after = sentence[at + len(token): at + len(token) + 45] if at >= 0 else ""
+    if not re.match(r"(?i)\s*(?:%|\\%|pp|points?|BLEU|F1)?\s*(?:points?\s+)?(?:absolute|relative)?\s*"
+                    r"(?:improvement|gain|increase|reduction|better|higher|lower|over|above|below)", after):
+        return ""
+    decimals = len(token.split(".")[1]) if "." in token else 0
+    half = 0.5 * 10 ** -decimals + 1e-9
+    beside = {n for n in re.findall(r"(?<![\w.])\d[\d,]*\.\d+", sentence)} - {token}  # results quoted with it
+    for a_text in sorted(beside):
+        a = float(a_text.replace(",", ""))
+        neighbours = set()
+        for row in rows.values():  # the same column of the same table
+            for j, c in enumerate(row["cells"]):
+                if (cell_number(c) or (None,))[0] == a:
+                    table = [r for r in rows.values() if r["caption"] == row["caption"] and r["header"] == row["header"]]
+                    neighbours |= {cell_number(r["cells"][j])[0] for r in table
+                                   if j < len(r["cells"]) and cell_number(r["cells"][j])}
+        for m in re.finditer(rf"(?<![\w.]){re.escape(a_text)}(?!\d)", body):  # a few sentences around it in the text
+            neighbours |= {float(n) for n in re.findall(r"(?<![\w.])\d+\.\d+(?!\d)", body[max(0, m.start() - 300): m.end() + 300])}
+        for b in sorted(neighbours - {a}):
+            # a baseline is of the same scale as the result it is compared with
+            if 0.5 * a <= b <= 2 * a and abs(abs(a - b) - value) <= half:
+                return f"{max(a, b):g} - {min(a, b):g}"
+    return ""
+
+
 def abstract_numbers(text: str) -> tuple[list[dict], list[dict]]:
     """The results the abstract quotes, each looked for in the rest of the paper.
 
@@ -672,7 +712,14 @@ def abstract_numbers(text: str) -> tuple[list[dict], list[dict]]:
                            "kind": "restated", "expression": match.group(1), "computed": float(token),
                            "stated": float(token), "consistent": True, "quotes": [sentence, where], "by": "code"})
         else:
-            missing.append((match.group(1), sentence))
+            derived = derivation(float(token), token, sentence, body, rows)
+            if derived:  # "80.5% (7.7 point improvement)": 7.7 = 80.5 - 72.8, with 72.8 in the results
+                checks.append({"what": f"{match.group(1)}, quoted in the abstract, follows from numbers the paper "
+                                       f"prints", "kind": "arithmetic", "expression": derived,
+                               "computed": float(token), "stated": float(token), "consistent": True,
+                               "quotes": [sentence], "by": "code"})
+            else:
+                missing.append((match.group(1), sentence))
     checks += restated_differently(abstract, body)
     concerns = []
     if missing:
@@ -954,6 +1001,12 @@ def review(paper: str, own_words: str | None = None, tables: dict | None = None)
     return {**reading, "consistency": found}
 
 
+def far_apart(computed: float, stated: float) -> bool:
+    """Whether two values differ by more than half of the larger: not a misprint of one another."""
+    big = max(abs(computed), abs(stated))
+    return big > 0 and abs(computed - stated) > 0.5 * big
+
+
 def factor_off(computed: float, stated: float) -> bool:
     """Whether two values differ by a round factor (2, 3, 4, 8, 10, 100, 1000 or its inverse), within 2%."""
     if not computed or not stated:
@@ -973,6 +1026,9 @@ def confirmed(checks: list[dict], paper: str, judge: str = SECOND_READER) -> lis
     # A model's expression off by exactly 2, 4, 10 or 1000 has almost surely dropped a factor or a unit:
     # that is the check's error, not the paper's.
     checks = [c for c in checks if c["consistent"] or c.get("by") == "code" or not factor_off(c["computed"], c["stated"])]
+    # A slip in a paper prints a value near the right one (41.0 for 41.8); a model's check that lands far from
+    # the printed value (3.8 against 0.3) has almost surely put the wrong numbers together.
+    checks = [c for c in checks if c["consistent"] or c.get("by") == "code" or not far_apart(c["computed"], c["stated"])]
     disputed = [c for c in checks if not c["consistent"]]
     if not disputed:
         return checks
