@@ -5,11 +5,15 @@ paper the way a reviewer does, checks its numbers against each other, questions
 every claim, and re-runs the results it can compute.
 
 [![Live demo](https://img.shields.io/badge/live%20demo-paper--auditor.onrender.com-b3261e?style=flat-square)](https://paper-auditor.onrender.com)
+[![Video](https://img.shields.io/badge/video-3%20min%20demo-1c1b19?style=flat-square&logo=youtube)](https://www.youtube.com/watch?v=_dV-2sauzTs)
 [![NVIDIA Nemotron](https://img.shields.io/badge/models-NVIDIA%20Nemotron-2f6b3f?style=flat-square)](https://tokenfactory.nebius.com)
 [![Nebius Token Factory](https://img.shields.io/badge/inference-Nebius%20Token%20Factory-1c1b19?style=flat-square)](https://tokenfactory.nebius.com)
 [![License: MIT](https://img.shields.io/badge/license-MIT-6e695f?style=flat-square)](LICENSE)
 
 [![The front page](docs/images/front.png)](https://paper-auditor.onrender.com)
+
+▶ **[Watch the 3-minute demo](https://www.youtube.com/watch?v=_dV-2sauzTs)**: the PDF of each paper next to
+what the auditor found in it, a real run, and the code it writes.
 
 Built for the Nebius × NVIDIA Global AI Hackathon. The demo is a free instance:
 the first visit after a quiet spell takes about a minute to wake it up. The
