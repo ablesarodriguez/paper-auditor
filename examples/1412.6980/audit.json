@@ -1,0 +1,178 @@
+{
+ "title": "ADAM: A METHOD FOR STOCHASTIC OPTIMIZATION",
+ "ingest_method": "pdf-text+vision",
+ "claims": [],
+ "review": {
+  "title": "ADAM: A METHOD FOR STOCHASTIC OPTIMIZATION",
+  "year": 2015,
+  "summary": "The paper introduces Adam, a first-order stochastic optimization algorithm that maintains exponential moving averages of the gradient (first moment) and the squared gradient (second raw moment) with bias correction for initialization. It combines the advantages of AdaGrad (handling sparse gradients) and RMSProp (handling non-stationary objectives), is invariant to diagonal rescaling of gradients, and has low memory requirements. The authors provide a theoretical regret bound of O(\u221aT) in the online convex optimization framework, comparable to the best known results. Empirical evaluations on logistic regression, multilayer perceptrons, and convolutional networks show Adam performs favorably against several baselines. An extension, AdaMax, based on the infinity norm, is also derived.",
+  "strengths": [
+   {
+    "point": "The initialization bias correction for the exponential moving averages is well motivated and derived, addressing a known issue when decay rates are close to 1.",
+    "quote": "In algorithm 1 we therefore divide by this term to correct the initialization bias."
+   },
+   {
+    "point": "The update rule is invariant to the scale of the gradients, which is a desirable property for optimization across different parameterizations.",
+    "quote": "\u0394_t is also invariant to the scale of the gradients; rescaling the gradients g with factor c will scale m\u0302_t with a factor c and v\u0302_t with a factor c\u00b2, which cancel out: (c \u00b7 m\u0302_t) / (\u221a(c\u00b2) \u00b7 v\u0302_t) = m\u0302_t / \u221a(v\u0302_t)."
+   },
+   {
+    "point": "A theoretical regret bound is provided for the online convex setting, showing average regret converges to zero at rate O(1/\u221aT).",
+    "quote": "Adam achieves the following guarantee, for all T \u2265 1. R(T)/T = O(1/\u221aT)"
+   },
+   {
+    "point": "The AdaMax variant yields a simple and stable algorithm using the infinity norm, with a particularly clean recursive update.",
+    "quote": "In the special case where we let p \u2192 \u221e, a surprisingly simple and stable algorithm emerges; see algorithm 2."
+   }
+  ],
+  "concerns": [
+   {
+    "severity": "major",
+    "category": "soundness",
+    "point": "The theoretical analysis (Theorem 4.1) assumes a decaying learning rate \u03b1_t \u221d t^{-1/2} and a decaying first-moment coefficient \u03b2_{1,t} = \u03b2\u2081 \u03bb^{t-1}, but the presented algorithm (Algorithm 1) uses constant \u03b2\u2081, \u03b2\u2082 and constant \u03b1. The theorem therefore does not directly apply to the algorithm as written.",
+    "quote": "Our following theorem holds when the learning rate $\\alpha_t$ is decaying at a rate of $t^{-\\frac{1}{2}}$ and first moment running average coefficient $\\beta_{1,t}$ decay exponentially with $\\lambda$, that is typically close to 1, e.g. $1 - 10^{-8}$.",
+    "suggestion": "Either modify the algorithm to match the theoretical assumptions (e.g., schedule \u03b2\u2081 and \u03b1) or re-state the theorem for the constant-parameter version used in experiments."
+   },
+   {
+    "severity": "major",
+    "category": "clarity",
+    "point": "The derivation of the expected second moment (Equation 3\u20134) introduces an undefined term \u03b6 and uses \u03b2\u2081 in the explanation of the second-moment bias, creating confusion between the two decay rates.",
+    "quote": "where $\\zeta = 0$ if the true second moment $\\mathbb{E}[g_i^2]$ is stationary; otherwise $\\zeta$ can be kept small since the exponential decay rate $\\beta_1$ can (and should) be chosen such that the exponential moving average assigns small weights to gradients too far in the past.",
+    "suggestion": "Clarify the role of \u03b6, use \u03b2\u2082 consistently for the second moment, and ensure the bias-correction derivation is self-contained and notationally clean."
+   },
+   {
+    "severity": "minor",
+    "category": "evidence",
+    "point": "The experimental section reports only single-run curves without error bars, random seeds, or number of repetitions, making it impossible to assess variability or statistical significance of the claimed improvements.",
+    "quote": "Experiments in this work were partly carried out on the Dutch national e-infrastructure with the support of SURF Foundation.",
+    "suggestion": "Report results over multiple random seeds with error bars or confidence intervals, and specify the software/hardware environment precisely."
+   },
+   {
+    "severity": "minor",
+    "category": "consistency",
+    "point": "The paper claims hyperparameters 'typically require little tuning' but also states that they are 'searched over a dense grid and the results are reported using the best hyper-parameter setting', which contradicts the claim of little tuning.",
+    "quote": "The hyper-parameters have intuitive interpretations and typically require little tuning.",
+    "suggestion": "Either demonstrate robustness by showing performance across a range of hyperparameters without extensive search, or temper the claim about little tuning."
+   },
+   {
+    "severity": "minor",
+    "category": "completeness",
+    "point": "The paper does not discuss limitations of the method (e.g., sensitivity to hyperparameters in non-convex settings, lack of convergence guarantees for non-convex objectives, or comparison with more recent adaptive methods).",
+    "quote": "Overall, we found Adam to be robust and well-suited to a wide range of non-convex optimization problems in the field machine learning.",
+    "suggestion": "Add a dedicated limitations section acknowledging where Adam may underperform or where theoretical guarantees do not extend."
+   }
+  ],
+  "dropped": 0,
+  "withdrawn": [
+   {
+    "point": "The AdaMax derivation parameterizes the decay as \u03b2\u2082^p and then takes p \u2192 \u221e, but \u03b2\u2082^p \u2192 0 for any \u03b2\u2082 \u2208 [0,1), making the limit degenerate and the connection to the original \u03b2\u2082 unclear.",
+    "answer": "",
+    "why": "The referee claims the limit $p\\to\\infty$ is degenerate because $\\beta_2^p\\to0$, but the paper derives a well-defined, non-degenerate limit (Equation 11) that yields the simple recursive formula $u_t = \\max(\\beta_2 u_{t-1}, |g_t|)$."
+   }
+  ],
+  "checklist": [
+   {
+    "item": "Data available or fully described",
+    "status": "no",
+    "quote": "",
+    "note": "No mention of data availability or detailed dataset descriptions beyond names (MNIST, IMDB, CIFAR-10)."
+   },
+   {
+    "item": "Code available",
+    "status": "no",
+    "quote": "",
+    "note": "No code repository or supplementary material is referenced."
+   },
+   {
+    "item": "Method described fully enough to implement",
+    "status": "yes",
+    "quote": "Algorithm 1: Adam, our proposed algorithm for stochastic optimization. See section 2 for details...",
+    "note": "Pseudocode for both Adam and AdaMax is complete and unambiguous."
+   },
+   {
+    "item": "Parameters and settings given",
+    "status": "yes",
+    "quote": "",
+    "note": "Default hyperparameters are explicitly stated for both algorithms."
+   },
+   {
+    "item": "Hardware and software environment given",
+    "status": "partly",
+    "quote": "Experiments in this work were partly carried out on the Dutch national e-infrastructure with the support of SURF Foundation.",
+    "note": "Only a high-level compute infrastructure is mentioned; no software frameworks, GPU models, or library versions."
+   },
+   {
+    "item": "Randomness controlled (seeds, repetitions)",
+    "status": "no",
+    "quote": "",
+    "note": "No random seeds, number of runs, or variance control mentioned."
+   },
+   {
+    "item": "Variability reported (error bars, repeated runs)",
+    "status": "no",
+    "quote": "",
+    "note": "Figures show single curves per method; no error bars or statistical measures."
+   },
+   {
+    "item": "Comparisons or baselines adequate",
+    "status": "partly",
+    "quote": "We compare Adam to accelerated SGD with Nesterov momentum and Adagrad... RMSProp... AdaDelta... SFO",
+    "note": "Several relevant baselines are included, but no statistical comparison and some baselines (e.g., SFO) are not standard for the settings tested."
+   },
+   {
+    "item": "Metrics defined",
+    "status": "yes",
+    "quote": "",
+    "note": "Training cost and regret are clearly defined."
+   },
+   {
+    "item": "Limitations discussed",
+    "status": "no",
+    "quote": "",
+    "note": "No explicit limitations section; conclusion only states robustness."
+   }
+  ],
+  "questions": [
+   "The theoretical regret bound assumes decaying \u03b2_{1,t} and \u03b1_t, but the algorithm uses constant values. How should practitioners reconcile this discrepancy, and does the bound hold for the constant-parameter version?",
+   "In the AdaMax derivation, the decay term is written as \u03b2\u2082^p and then p \u2192 \u221e is taken. Since \u03b2\u2082^p \u2192 0, the effective memory horizon collapses; can you clarify the intended parameterization and the limit?",
+   "The experiments report only single-run trajectories. Can you provide results averaged over multiple random seeds with error bars to support the claim that Adam 'consistently outperforms other methods'?",
+   "The paper states hyperparameters 'typically require little tuning' but also describes a dense grid search. Can you show performance across a reasonable hyperparameter range without per-dataset tuning?",
+   "The proof in the appendix contains several undefined symbols (e.g., \u03b6, \u03b3, \u03bb in the regret bound) and apparent typographical errors. Can you provide a corrected, self-contained version of the theoretical analysis?"
+  ],
+  "consistency": []
+ },
+ "related": {
+  "queries": [
+   "adaptive learning rate stochastic gradient descent first second moment estimation bias correction",
+   "exponential moving average gradient squared gradient bias correction stochastic optimization",
+   "adam optimizer adaptive moment estimation stochastic gradient descent",
+   "adagrad rmsprop combination adaptive learning rate diagonal rescaling invariance"
+  ],
+  "related": [
+   {
+    "title": "A modification of adaptive moment estimation (adam) for machine learning",
+    "url": "https://www.aimsciences.org/article/doi/10.3934/jimo.2024014",
+    "relation": "builds on it",
+    "note": "This work proposes a modification of the Adam optimizer for machine learning, directly extending the algorithm introduced in the paper under review.",
+    "cited": false,
+    "year": null
+   },
+   {
+    "title": "TOWARDS GUIDED DESCENT: OPTIMIZATION ALGORITHMS FOR TRAINING NEURAL NETWORKS AT SCALE",
+    "url": "https://arxiv.org/html/2512.18373v1",
+    "relation": "same problem",
+    "note": "This work discusses the same problem of stochastic optimization for neural networks and explicitly describes Adam as the combination of AdaGrad and RMSProp, confirming the paper's central motivation.",
+    "cited": false,
+    "year": 2025
+   }
+  ],
+  "assessment": "The paper introduces the foundational Adam algorithm, which is now a standard baseline in deep learning optimization. The first result shows direct algorithmic extensions, while the second confirms its established position in the literature. The snippets do not reveal the specific theoretical contributions (e.g., the O(\u221aT) regret bound or the AdaMax variant), so the novelty of the analysis components cannot be fully judged from these results alone.",
+  "paper_year": 2014
+ },
+ "figures": {
+  "1": "This figure contains two line graphs side by side, each showing the training cost (negative log likelihood) over iterations for logistic regression on different datasets. ### Left Panel: MNIST Logistic Regression - **Title**: \"MNIST Logistic Regression\" - **X-axis**: \"iterations over entire dataset\" with tick marks at 0, 5, 10, 15, 20, 25, 30, 35, 40, 45. - **Y-axis**: \"training cost\" with tick marks at 0.2, 0.3, 0.4, 0.5, 0.6, 0.7. - **Legend**: Three lines labeled \"AdaGrad\" (blue), \"SGDNesterov\" (green), and \"Adam\" (red). - **Trend**: All three lines start near 0.7 and decrease over iterations. AdaGrad (blue) drops fastest initially, followed by Adam (red), then SGDNesterov (green), with all converging to a low cost (~0.2) by iteration 45. ### Right Panel: IMDB BoW feature Logistic Regression - **Title**: \"IMDB BoW feature Logistic Regression\" - **X-axis**: \"iterations over entire dataset\" with tick marks at 0, 20, 40, 60, 80, 100, 120, 140, 160. - **Y-axis**: \"training cost\" with tick marks at 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50. - **Legend**: Four lines labeled \"Adagrad+dropout\" (blue), \"RMSProp+dropout\" (red), \"SGDNesterov+dropout\" (green), and \"Adam+dropout\" (cyan). - **Trend**: All lines start near 0.5 and decrease over iterations. RMSProp+dropout (red",
+  "2": "This figure consists of two panels labeled (a) and (b), both showing training cost curves for different optimization algorithms applied to multilayer neural networks on MNIST images. Panel (a) is titled \"MNIST Multilayer Neural Network + dropout\" and plots \"training cost\" on the y-axis (logarithmic scale, ranging from 10^-2 to 10^1) against \"iterations over entire dataset\" on the x-axis (ranging from 0 to 200). The legend lists six algorithms: AdaGrad (blue line), RMSProp (green line), SGDNesterov (red line), AdaDelta (cyan line), Adam (pink line). The curves show training cost decreasing over iterations, with all algorithms converging to similar low costs by 200 iterations. Panel (b) is titled \"MNIST Multilayer Neural Networks\" and has two subplots. The top subplot is labeled \"MNIST Multilayer Neural Networks\" and plots \"training cost\" on the y-axis (logarithmic scale, ranging from 10^-2 to 10^1) against \"iterations over entire dataset\" on the x-axis (ranging from 0 to 20). The legend shows SFO (blue line) and Adam (green line). The bottom subplot is also labeled \"MNIST Multilayer Neural Networks\" and plots \"training cost\" on the y-axis (logarithmic scale, ranging from 10^-2 to 10^1) against \"normalized weight\" on the x-axis (ranging from 0 to 1). The legend again shows SFO (blue line) and Adam (green line). In both subplots of (b), the SFO and Adam curves show training cost decreasing over iterations/normalized weight, with SFO starting higher but converging similarly to Adam. The main text below the figure reads: \"Figure 2: Training of multilayer neural networks on MNIST images. (a) Neural networks using dropout stochastic regularization. (b) Neural networks with deterministic cost function. We compare with the sum-of-functions (SFO) optimizer (Sohl-Dickstein et al",
+  "3": "This figure consists of two line graphs side by side, both titled \"CIFAR10 ConvNet.\" ### Left Panel: - **Title**: \"CIFAR10 ConvNet First 3 Epoches\" (note: \"Epoches\" is likely a typo for \"Epochs\"). - **X-axis**: \"iterations over entire dataset\" with tick marks at 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0. - **Y-axis**: \"training cost\" with tick marks at 2.0, 3.0 (no explicit lower limit shown, but the lines start above 2.0). - **Legend**: Lists six optimization methods: - AdaGrad (blue line) - AdaGrad+dropout (green line) - SGDNesterov (red line) - SGDNesterov+dropout (pink line) - Adam (yellow line) - Adam+dropout (purple line) - **Trend**: All six lines start at similar high training costs (around 2.5\u20133.0) and decrease as iterations increase, with all methods converging toward lower costs (approaching 1.0 by the end of 3 epochs). ### Right Panel: - **Title**: \"CIFAR10 ConvNet\" (no \"First 3 Epoches\" here). - **X-axis**: \"iterations over entire dataset\" with tick marks at 0, 5, 10, 15, 20, 25, 30, 35, 40, 45. - **Y-axis**: \"training cost\" with a logarithmic scale, tick marks labeled as 10\u207b\u2074, 10\u207b\u00b3, 10\u207b\u00b2, 10\u207b\u00b9, 10\u2070, 10\u00b9, 10\u00b2 (note: the axis label is \"training cost,\" but the values are in scientific notation). - **Legend**: Same six",
+  "4": "This figure consists of two main panels labeled (a) and (b), each containing four subplots arranged in a 2x2 grid. ### Panel (a): after 10 epochs - **Top row (\u03b2\u2081=0)**: Left subplot (\u03b2\u2082=0.99) and right subplot (\u03b2\u2082=0.9999) show loss curves. The x-axis is labeled \"log\u2081\u2080(\u03b1)\" (stepsize \u03b1 on a logarithmic scale), and the y-axis is \"Loss\". The red line (bias-correction terms) and green line (no bias correction) are plotted. - **Bottom row (\u03b2\u2081=0.9)**: Left subplot (\u03b2\u2082=0.99) and right subplot (\u03b2\u2082=0.9999) also show loss curves with the same axes and line colors. ### Panel (b): after 100 epochs - **Top row (\u03b2\u2081=0)**: Left subplot (\u03b2\u2082=0.99) and right subplot (\u03b2\u2082=0.9999) show loss curves with the same axes and line colors. - **Bottom row (\u03b2\u2081=0.9)**: Left subplot (\u03b2\u2082=0.99) and right subplot (\u03b2\u2082=0.9999) show loss curves with the same axes and line colors. ### Labels and Values: - Subplot titles: \"\u03b2\u2081=0\" (top row), \"\u03b2\u2081=0.9\" (bottom row); \"\u03b2\u2082=0.99\", \"\u03b2\u2082=0.999\", \"\u03b2\u2082=0.9999\" (column labels for \u03b2\u2082). - X-axis label: \"log\u2081\u2080(\u03b1)\" (across all subplots). - Y-axis label: \"Loss\" (across all subplots). - Figure caption: \"Figure 4: Effect of bias-correction terms (red line) versus no bias correction terms (green line) after 10 epochs (left) and 100 epochs (right) on the loss (y"
+ },
+ "data": ""
+}

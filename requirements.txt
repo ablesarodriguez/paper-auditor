@@ -1,0 +1,12 @@
+openai
+tavily-python
+python-dotenv
+numpy
+scipy
+mpmath
+sympy
+matplotlib
+pymupdf
+json-repair
+gradio
+pillow

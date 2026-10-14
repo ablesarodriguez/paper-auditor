@@ -1,0 +1,967 @@
+{
+ "title": "A variational symplectic scheme based on Lobatto's quadrature",
+ "ingest_method": "arxiv-latex",
+ "claims": [
+  {
+   "id": "C1",
+   "statement": "In the table captioned \"Errors in the maximum norm. The Lobatto approximation is sixth-order accurate and preserves a discrete energy. Comparable values from both the implicit midpoint and Simpson schemes can be found in \\cite{dubois2023_gsi}. The estimated convergence order is the closest integer $\\alpha$ measuring the ratio of successive errors in a given line by a negative power of 2 of the type $2^{-\\alpha}$.\", the row \"Momentum $p$\" reads, by Number of meshes: 10 -> 8.95248e-06; 20 -> 1.39279e-07; 40 -> 2.17034e-09. The paper introduces this table as follows: \"The harmonic oscillator evolution was simulated using the Lobatto scheme (\\ref{eq:symplecticSystem}) (\\ref{eq:symplecticCoeffs}). Results for both $ \\, N = 3$ meshes are displayed on Fig. \\ref{fig:simulations}, compared with the exact solutions $ \\, q(t)=\\frac{\\pi}{2} \\, \\cos (\\omega t) \\, $ and $ \\, p(t) = -\\frac{\\pi}{2} \\, m \\, \\omega \\, \\sin(\\omega t) \\, $ on a period $ \\, T=1 $. Comparable results from both the implicit midpoint and Simpson schemes are also provided for reference (see \\textit{e.\\,g.} \\cite{dubois2023_gsi}). Quantitative errors with the $ \\, \\ell^\\infty $ norm are given in Tab. \\ref{tab:errorNorms}. An asymptotic order of convergence of 6 is estimated for the momentum, states, and energy. Fig. \\ref{fig:errorEvolution} shows the $\\ell^\\infty$ energy error norm evolution across $ \\num{1e5} $ periods of motion.\"",
+   "location": "table tab:errorNorms, row \"Momentum $p$\"",
+   "table_row": "T1.R2",
+   "kind": "numeric",
+   "needs_data": null,
+   "without_data": null,
+   "expected": "table row T1.R2, \"Momentum $p$\" (Number of meshes: 10 -> 8.95248e-6; 20 -> 1.39279e-7; 40 -> 2.17034e-9; order -> 6)",
+   "expected_value": [
+    8.95248e-06,
+    1.39279e-07,
+    2.17034e-09
+   ],
+   "tolerance": {
+    "type": "relative",
+    "value": 1e-05
+   },
+   "given_details": {
+    "system": "harmonic oscillator",
+    "Lagrangian": "L = 1/2 m (dq/dt)^2 - 1/2 m \u03c9^2 q^2",
+    "period T": "1",
+    "step sizes h": "0.1, 0.05, 0.025 (N=10,20,40)",
+    "initial conditions": "q(0)=\u03c0/2, p(0)=0",
+    "exact solution": "q(t)=\u03c0/2 cos(\u03c9t), p(t)=-\u03c0/2 m \u03c9 sin(\u03c9t) with \u03c9=2\u03c0",
+    "scheme": "Lobatto symplectic scheme (eq:symplecticSystem, eq:symplecticCoeffs)",
+    "mass m": "not explicitly stated, assumed 1"
+   },
+   "missing_details": [
+    "mass m value (not stated in paper, assumed 1 for reproduction)"
+   ],
+   "deferred_to": [],
+   "statement_as_extracted": "The maximum-norm errors in momentum p for the harmonic oscillator simulation using the Lobatto scheme with step sizes h=0.1, 0.05, 0.025 (N=10, 20, 40 meshes over T=1) are as reported in table row T1.R2, with an observed convergence order of 6.",
+   "summary": "Table tab:errorNorms, row \"Momentum $p$\": 8.95248e-06, 1.39279e-07, 2.17034e-09 (by Number of meshes: 10, 20, 40)",
+   "approach": "Simulate the harmonic oscillator using the Lobatto symplectic scheme (equations symplecticSystem and symplecticCoeffs) with step sizes h=0.1, 0.05, 0.025 (N=10,20,40) over one period T=1. Initial conditions: q(0)=\u03c0/2, p(0)=0. Parameters: \u03c9=2\u03c0, mass m (from assumption). Compute the numerical solution at each time step. The exact momentum is p_exact(t) = -\u03c0/2 m \u03c9 sin(\u03c9 t). Compute the maximum absolute error (\u2113\u221e norm) between numerical and exact momentum over the period. Repeat for each h.",
+   "assumptions": [
+    {
+     "name": "mass_m",
+     "missing_detail": "mass m value (not stated in paper, assumed 1 for reproduction)",
+     "default": 1,
+     "alternatives": [
+      0.5,
+      2
+     ],
+     "rationale": "Mass m is not specified in the paper; typical default is 1. Alternatives 0.5 and 2 are plausible other values a reader might assume.",
+     "source": null
+    }
+   ],
+   "failed_attempts": [],
+   "obtained": [
+    8.952483712576509e-06,
+    1.3927897057897098e-07,
+    2.170337687346091e-09
+   ],
+   "detail": "Maximum norm errors in momentum p for h=[0.1, 0.05, 0.025]: ['8.952e-06', '1.393e-07', '2.170e-09']",
+   "script": "script.py",
+   "reproduced": true,
+   "matches_paper": true,
+   "sensitivity": [
+    {
+     "assumption": "mass_m",
+     "value": 0.5,
+     "obtained": [
+      4.4762418562882544e-06,
+      6.963948528948549e-08,
+      1.0851688436730456e-09
+     ],
+     "detail": "Maximum norm errors in momentum p for h=[0.1, 0.05, 0.025]: ['4.476e-06', '6.964e-08', '1.085e-09']",
+     "error": "",
+     "matches": false,
+     "relative_change": -0.5,
+     "identical_output": false
+    },
+    {
+     "assumption": "mass_m",
+     "value": 2,
+     "obtained": [
+      1.7904967425153018e-05,
+      2.7855794115794197e-07,
+      4.340675374692182e-09
+     ],
+     "detail": "Maximum norm errors in momentum p for h=[0.1, 0.05, 0.025]: ['1.790e-05', '2.786e-07', '4.341e-09']",
+     "error": "",
+     "matches": false,
+     "relative_change": 1.0,
+     "identical_output": false
+    }
+   ],
+   "verdict": "verified_under_assumption",
+   "decisive_assumptions": [
+    "mass_m"
+   ],
+   "agreeing_digits": 17,
+   "confidence": "caveats",
+   "warnings": [
+    "The paper's numbers come out only for a particular value of mass_m, which the paper does not state."
+   ]
+  },
+  {
+   "id": "C2",
+   "statement": "In the table captioned \"Errors in the maximum norm. The Lobatto approximation is sixth-order accurate and preserves a discrete energy. Comparable values from both the implicit midpoint and Simpson schemes can be found in \\cite{dubois2023_gsi}. The estimated convergence order is the closest integer $\\alpha$ measuring the ratio of successive errors in a given line by a negative power of 2 of the type $2^{-\\alpha}$.\", the row \"State $q$\" reads, by Number of meshes: 10 -> 7.64034e-07; 20 -> 1.19368e-08; 40 -> 1.87641e-10. The paper introduces this table as follows: \"The harmonic oscillator evolution was simulated using the Lobatto scheme (\\ref{eq:symplecticSystem}) (\\ref{eq:symplecticCoeffs}). Results for both $ \\, N = 3$ meshes are displayed on Fig. \\ref{fig:simulations}, compared with the exact solutions $ \\, q(t)=\\frac{\\pi}{2} \\, \\cos (\\omega t) \\, $ and $ \\, p(t) = -\\frac{\\pi}{2} \\, m \\, \\omega \\, \\sin(\\omega t) \\, $ on a period $ \\, T=1 $. Comparable results from both the implicit midpoint and Simpson schemes are also provided for reference (see \\textit{e.\\,g.} \\cite{dubois2023_gsi}). Quantitative errors with the $ \\, \\ell^\\infty $ norm are given in Tab. \\ref{tab:errorNorms}. An asymptotic order of convergence of 6 is estimated for the momentum, states, and energy. Fig. \\ref{fig:errorEvolution} shows the $\\ell^\\infty$ energy error norm evolution across $ \\num{1e5} $ periods of motion.\"",
+   "location": "table tab:errorNorms, row \"State $q$\"",
+   "table_row": "T1.R3",
+   "kind": "numeric",
+   "needs_data": null,
+   "without_data": null,
+   "expected": "table row T1.R3, \"State $q$\" (Number of meshes: 10 -> 7.64034e-7; 20 -> 1.19368e-8; 40 -> 1.87641e-10; order -> 6)",
+   "expected_value": [
+    7.64034e-07,
+    1.19368e-08,
+    1.87641e-10
+   ],
+   "tolerance": {
+    "type": "relative",
+    "value": 1e-05
+   },
+   "given_details": {
+    "system": "harmonic oscillator",
+    "Lagrangian": "L = 1/2 m (dq/dt)^2 - 1/2 m \u03c9^2 q^2",
+    "period T": "1",
+    "step sizes h": "0.1, 0.05, 0.025 (N=10,20,40)",
+    "initial conditions": "q(0)=\u03c0/2, p(0)=0",
+    "exact solution": "q(t)=\u03c0/2 cos(\u03c9t), p(t)=-\u03c0/2 m \u03c9 sin(\u03c9t) with \u03c9=2\u03c0",
+    "scheme": "Lobatto symplectic scheme (eq:symplecticSystem, eq:symplecticCoeffs)",
+    "mass m": "not explicitly stated, assumed 1"
+   },
+   "missing_details": [
+    "mass m value (not stated in paper, assumed 1 for reproduction)"
+   ],
+   "deferred_to": [],
+   "statement_as_extracted": "The maximum-norm errors in state q for the harmonic oscillator simulation using the Lobatto scheme with step sizes h=0.1, 0.05, 0.025 (N=10, 20, 40 meshes over T=1) are as reported in table row T1.R3, with an observed convergence order of 6.",
+   "summary": "Table tab:errorNorms, row \"State $q$\": 7.64034e-07, 1.19368e-08, 1.87641e-10 (by Number of meshes: 10, 20, 40)",
+   "approach": "Simulate the harmonic oscillator using the Lobatto symplectic scheme (equations symplecticSystem and symplecticCoeffs) with step sizes h=0.1, 0.05, 0.025 (N=10,20,40) over one period T=1. Initial conditions: q(0)=\u03c0/2, p(0)=0. Parameters: \u03c9=2\u03c0, mass m (from assumption). Compute the numerical solution at each time step. The exact state is q_exact(t) = \u03c0/2 cos(\u03c9 t). Compute the maximum absolute error (\u2113\u221e norm) between numerical and exact state over the period. Repeat for each h.",
+   "assumptions": [
+    {
+     "name": "mass_m",
+     "missing_detail": "mass m value (not stated in paper, assumed 1 for reproduction)",
+     "default": 1,
+     "alternatives": [
+      0.5,
+      2
+     ],
+     "rationale": "Mass m is not specified in the paper; typical default is 1. Alternatives 0.5 and 2 are plausible other values a reader might assume.",
+     "source": null
+    }
+   ],
+   "failed_attempts": [],
+   "obtained": [
+    7.640339712566835e-07,
+    1.193676252286835e-08,
+    1.8764167997176173e-10
+   ],
+   "detail": "Lobatto state q errors (h=0.1,0.05,0.025): 7.640e-07, 1.194e-08, 1.876e-10",
+   "script": "script.py",
+   "reproduced": true,
+   "matches_paper": true,
+   "sensitivity": [
+    {
+     "assumption": "mass_m",
+     "value": 0.5,
+     "obtained": [
+      7.640339712566835e-07,
+      1.193676252286835e-08,
+      1.8764167997176173e-10
+     ],
+     "detail": "Lobatto state q errors (h=0.1,0.05,0.025): 7.640e-07, 1.194e-08, 1.876e-10",
+     "error": "",
+     "matches": true,
+     "relative_change": 0.0,
+     "identical_output": true
+    },
+    {
+     "assumption": "mass_m",
+     "value": 2,
+     "obtained": [
+      7.640339712566835e-07,
+      1.193676252286835e-08,
+      1.8764167997176173e-10
+     ],
+     "detail": "Lobatto state q errors (h=0.1,0.05,0.025): 7.640e-07, 1.194e-08, 1.876e-10",
+     "error": "",
+     "matches": true,
+     "relative_change": 0.0,
+     "identical_output": true
+    }
+   ],
+   "verdict": "verified",
+   "decisive_assumptions": [],
+   "agreeing_digits": 16,
+   "confidence": "high",
+   "warnings": []
+  },
+  {
+   "id": "C3",
+   "statement": "In the table captioned \"Errors in the maximum norm. The Lobatto approximation is sixth-order accurate and preserves a discrete energy. Comparable values from both the implicit midpoint and Simpson schemes can be found in \\cite{dubois2023_gsi}. The estimated convergence order is the closest integer $\\alpha$ measuring the ratio of successive errors in a given line by a negative power of 2 of the type $2^{-\\alpha}$.\", the row \"Energy $H(p,q)$\" reads, by Number of meshes: 10 -> 6.61948e-05; 20 -> 1.09831e-06; 40 -> 1.69917e-08. The paper introduces this table as follows: \"The harmonic oscillator evolution was simulated using the Lobatto scheme (\\ref{eq:symplecticSystem}) (\\ref{eq:symplecticCoeffs}). Results for both $ \\, N = 3$ meshes are displayed on Fig. \\ref{fig:simulations}, compared with the exact solutions $ \\, q(t)=\\frac{\\pi}{2} \\, \\cos (\\omega t) \\, $ and $ \\, p(t) = -\\frac{\\pi}{2} \\, m \\, \\omega \\, \\sin(\\omega t) \\, $ on a period $ \\, T=1 $. Comparable results from both the implicit midpoint and Simpson schemes are also provided for reference (see \\textit{e.\\,g.} \\cite{dubois2023_gsi}). Quantitative errors with the $ \\, \\ell^\\infty $ norm are given in Tab. \\ref{tab:errorNorms}. An asymptotic order of convergence of 6 is estimated for the momentum, states, and energy. Fig. \\ref{fig:errorEvolution} shows the $\\ell^\\infty$ energy error norm evolution across $ \\num{1e5} $ periods of motion.\"",
+   "location": "table tab:errorNorms, row \"Energy $H(p,q)$\"",
+   "table_row": "T1.R4",
+   "kind": "numeric",
+   "needs_data": null,
+   "without_data": null,
+   "expected": "table row T1.R4, \"Energy $H(p,q)$\" (Number of meshes: 10 -> 0.0000661948; 20 -> 1.09831e-6; 40 -> 1.69917e-8; order -> 6)",
+   "expected_value": [
+    6.61948e-05,
+    1.09831e-06,
+    1.69917e-08
+   ],
+   "tolerance": {
+    "type": "relative",
+    "value": 1e-05
+   },
+   "given_details": {
+    "system": "harmonic oscillator",
+    "Lagrangian": "L = 1/2 m (dq/dt)^2 - 1/2 m \u03c9^2 q^2",
+    "period T": "1",
+    "step sizes h": "0.1, 0.05, 0.025 (N=10,20,40)",
+    "initial conditions": "q(0)=\u03c0/2, p(0)=0",
+    "exact solution": "q(t)=\u03c0/2 cos(\u03c9t), p(t)=-\u03c0/2 m \u03c9 sin(\u03c9t) with \u03c9=2\u03c0",
+    "scheme": "Lobatto symplectic scheme (eq:symplecticSystem, eq:symplecticCoeffs)",
+    "mass m": "not explicitly stated, assumed 1"
+   },
+   "missing_details": [
+    "mass m value (not stated in paper, assumed 1 for reproduction)"
+   ],
+   "deferred_to": [],
+   "statement_as_extracted": "The maximum-norm errors in continuous energy H(p,q) for the harmonic oscillator simulation using the Lobatto scheme with step sizes h=0.1, 0.05, 0.025 (N=10, 20, 40 meshes over T=1) are as reported in table row T1.R4, with an observed convergence order of 6.",
+   "summary": "Table tab:errorNorms, row \"Energy $H(p,q)$\": 6.61948e-05, 1.09831e-06, 1.69917e-08 (by Number of meshes: 10, 20, 40)",
+   "approach": "Simulate the harmonic oscillator using the Lobatto symplectic scheme (equations symplecticSystem and symplecticCoeffs) with step sizes h=0.1, 0.05, 0.025 (N=10,20,40) over one period T=1. Initial conditions: q(0)=\u03c0/2, p(0)=0. Parameters: \u03c9=2\u03c0, mass m (from assumption). Compute the numerical solution at each time step. The continuous energy is H(p,q) = p^2/(2m) + 1/2 m \u03c9^2 q^2. The exact energy is constant: H_exact = 1/2 m \u03c9^2 (\u03c0/2)^2. Compute the maximum absolute error (\u2113\u221e norm) between numerical H and H_exact over the period. Repeat for each h.",
+   "assumptions": [
+    {
+     "name": "mass_m",
+     "missing_detail": "mass m value (not stated in paper, assumed 1 for reproduction)",
+     "default": 1,
+     "alternatives": [
+      0.5,
+      2
+     ],
+     "rationale": "Mass m is not specified in the paper; typical default is 1. Alternatives 0.5 and 2 are plausible other values a reader might assume.",
+     "source": null
+    }
+   ],
+   "failed_attempts": [],
+   "obtained": [
+    6.619476305758099e-05,
+    1.0983068463588097e-06,
+    1.6991663187582162e-08
+   ],
+   "detail": "Maximum energy errors: 6.62e-05, 1.10e-06, 1.70e-08 for h=0.1, 0.05, 0.025 (mass m=1).",
+   "script": "script.py",
+   "reproduced": true,
+   "matches_paper": true,
+   "sensitivity": [
+    {
+     "assumption": "mass_m",
+     "value": 0.5,
+     "obtained": [
+      3.309738152879049e-05,
+      5.491534231794049e-07,
+      8.495831593791081e-09
+     ],
+     "detail": "Maximum energy errors: 3.31e-05, 5.49e-07, 8.50e-09 for h=0.1, 0.05, 0.025 (mass m=0.5).",
+     "error": "",
+     "matches": false,
+     "relative_change": -0.5,
+     "identical_output": false
+    },
+    {
+     "assumption": "mass_m",
+     "value": 2,
+     "obtained": [
+      0.00013238952611516197,
+      2.1966136927176194e-06,
+      3.3983326375164324e-08
+     ],
+     "detail": "Maximum energy errors: 1.32e-04, 2.20e-06, 3.40e-08 for h=0.1, 0.05, 0.025 (mass m=2).",
+     "error": "",
+     "matches": false,
+     "relative_change": 1.0,
+     "identical_output": false
+    }
+   ],
+   "verdict": "verified_under_assumption",
+   "decisive_assumptions": [
+    "mass_m"
+   ],
+   "agreeing_digits": 16,
+   "confidence": "caveats",
+   "warnings": [
+    "The paper's numbers come out only for a particular value of mass_m, which the paper does not state."
+   ]
+  },
+  {
+   "id": "C4",
+   "statement": "In the table captioned \"Errors in the maximum norm. The Lobatto approximation is sixth-order accurate and preserves a discrete energy. Comparable values from both the implicit midpoint and Simpson schemes can be found in \\cite{dubois2023_gsi}. The estimated convergence order is the closest integer $\\alpha$ measuring the ratio of successive errors in a given line by a negative power of 2 of the type $2^{-\\alpha}$.\", the row \"Discrete energy $H_d(p,q)$\" reads, by Number of meshes: 10 -> 2.66454e-15; 20 -> 1.33227e-15; 40 -> 2.22045e-15. The paper introduces this table as follows: \"The harmonic oscillator evolution was simulated using the Lobatto scheme (\\ref{eq:symplecticSystem}) (\\ref{eq:symplecticCoeffs}). Results for both $ \\, N = 3$ meshes are displayed on Fig. \\ref{fig:simulations}, compared with the exact solutions $ \\, q(t)=\\frac{\\pi}{2} \\, \\cos (\\omega t) \\, $ and $ \\, p(t) = -\\frac{\\pi}{2} \\, m \\, \\omega \\, \\sin(\\omega t) \\, $ on a period $ \\, T=1 $. Comparable results from both the implicit midpoint and Simpson schemes are also provided for reference (see \\textit{e.\\,g.} \\cite{dubois2023_gsi}). Quantitative errors with the $ \\, \\ell^\\infty $ norm are given in Tab. \\ref{tab:errorNorms}. An asymptotic order of convergence of 6 is estimated for the momentum, states, and energy. Fig. \\ref{fig:errorEvolution} shows the $\\ell^\\infty$ energy error norm evolution across $ \\num{1e5} $ periods of motion.\"",
+   "location": "table tab:errorNorms, row \"Discrete energy $H_d(p,q)$\"",
+   "table_row": "T1.R5",
+   "kind": "numeric",
+   "needs_data": null,
+   "without_data": null,
+   "expected": "table row T1.R5, \"Discrete energy $H_d(p,q)$\" (Number of meshes: 10 -> 2.66454e-15; 20 -> 1.33227e-15; 40 -> 2.22045e-15; order -> exact)",
+   "expected_value": [
+    2.66454e-15,
+    1.33227e-15,
+    2.22045e-15
+   ],
+   "tolerance": {
+    "type": "absolute",
+    "value": 1e-14
+   },
+   "given_details": {
+    "system": "harmonic oscillator",
+    "Lagrangian": "L = 1/2 m (dq/dt)^2 - 1/2 m \u03c9^2 q^2",
+    "period T": "1",
+    "step sizes h": "0.1, 0.05, 0.025 (N=10,20,40)",
+    "initial conditions": "q(0)=\u03c0/2, p(0)=0",
+    "exact solution": "q(t)=\u03c0/2 cos(\u03c9t), p(t)=-\u03c0/2 m \u03c9 sin(\u03c9t) with \u03c9=2\u03c0",
+    "scheme": "Lobatto symplectic scheme (eq:symplecticSystem, eq:symplecticCoeffs)",
+    "discrete energy": "H_d(p,q) = c/(2\u03b4\u0303) p^2 - b/(2\u03b4\u0303) q^2 from eq:discreteEnergy",
+    "mass m": "not explicitly stated, assumed 1"
+   },
+   "missing_details": [
+    "mass m value (not stated in paper, assumed 1 for reproduction)"
+   ],
+   "deferred_to": [],
+   "statement_as_extracted": "The maximum-norm errors in discrete energy H_d(p,q) for the harmonic oscillator simulation using the Lobatto scheme with step sizes h=0.1, 0.05, 0.025 (N=10, 20, 40 meshes over T=1) are as reported in table row T1.R5, with the order marked as exact (machine precision).",
+   "summary": "Table tab:errorNorms, row \"Discrete energy $H_d(p,q)$\": 2.66454e-15, 1.33227e-15, 2.22045e-15 (by Number of meshes: 10, 20, 40)",
+   "approach": "Simulate the harmonic oscillator using the Lobatto symplectic scheme (equations symplecticSystem and symplecticCoeffs) with step sizes h=0.1, 0.05, 0.025 (N=10,20,40) over one period T=1. Initial conditions: q(0)=\u03c0/2, p(0)=0. Parameters: \u03c9=2\u03c0, mass m (from assumption). Compute the numerical solution at each time step. The discrete energy is H_d(p,q) = c/(2\u03b4\u0303) p^2 - b/(2\u03b4\u0303) q^2, where coefficients a,b,c,\u03b4\u0303 are given in eq:symplecticCoeffs. Compute H_d at each step and find the maximum absolute deviation from its initial value (or from the exact discrete energy, which is constant) over the period. Repeat for each h.",
+   "assumptions": [
+    {
+     "name": "mass_m",
+     "missing_detail": "mass m value (not stated in paper, assumed 1 for reproduction)",
+     "default": 1,
+     "alternatives": [
+      0.5,
+      2
+     ],
+     "rationale": "Mass m is not specified in the paper; typical default is 1. Alternatives 0.5 and 2 are plausible other values a reader might assume.",
+     "source": null
+    }
+   ],
+   "failed_attempts": [],
+   "obtained": [
+    7.105427357601002e-15,
+    1.509903313490213e-14,
+    1.1102230246251565e-15
+   ],
+   "detail": "Discrete energy errors: 7.105e-15, 1.510e-14, 1.110e-15 for h=0.1, 0.05, 0.025 (mass_m=1.0).",
+   "script": "script.py",
+   "reproduced": true,
+   "matches_paper": true,
+   "sensitivity": [
+    {
+     "assumption": "mass_m",
+     "value": 0.5,
+     "obtained": [
+      3.552713678800501e-15,
+      7.549516567451064e-15,
+      5.551115123125783e-16
+     ],
+     "detail": "Discrete energy errors: 3.553e-15, 7.550e-15, 5.551e-16 for h=0.1, 0.05, 0.025 (mass_m=0.5).",
+     "error": "",
+     "matches": true,
+     "relative_change": -0.5,
+     "identical_output": false
+    },
+    {
+     "assumption": "mass_m",
+     "value": 2,
+     "obtained": [
+      1.4210854715202004e-14,
+      3.019806626980426e-14,
+      2.220446049250313e-15
+     ],
+     "detail": "Discrete energy errors: 1.421e-14, 3.020e-14, 2.220e-15 for h=0.1, 0.05, 0.025 (mass_m=2.0).",
+     "error": "",
+     "matches": true,
+     "relative_change": 1.0,
+     "identical_output": false
+    }
+   ],
+   "verdict": "verified",
+   "decisive_assumptions": [],
+   "agreeing_digits": 0,
+   "confidence": "caveats",
+   "warnings": [
+    "The paper's values are at the level of floating-point round-off: only that level can be reproduced, not the digits, so the match shows the quantity is conserved to machine precision and no more."
+   ]
+  },
+  {
+   "id": "C5",
+   "statement": "Over 1e5 periods of the harmonic oscillator, the \u2113^\u221e energy error growth rate for the Lobatto scheme is 2.50e-11 for h=0.1, 5.45e-14 for h=0.05, and 1.35e-13 for h=0.025.",
+   "location": "Figure 2 (fig:errorEvolution) caption",
+   "kind": "numeric",
+   "needs_data": null,
+   "without_data": null,
+   "expected": "Energy error growth rates for three step sizes over 1e5 periods",
+   "expected_value": [
+    2.5e-11,
+    5.45e-14,
+    1.35e-13
+   ],
+   "tolerance": {
+    "type": "relative",
+    "value": 0.01
+   },
+   "given_details": {
+    "system": "harmonic oscillator",
+    "scheme": "Lobatto symplectic scheme",
+    "periods": "1e5",
+    "step sizes": "h=0.1, 0.05, 0.025",
+    "energy error": "\u2113^\u221e norm of energy error (likely continuous H(p,q))",
+    "initial conditions": "q(0)=\u03c0/2, p(0)=0, \u03c9=2\u03c0, m=1 assumed"
+   },
+   "missing_details": [
+    "mass m value",
+    "whether energy error refers to continuous H or discrete H_d",
+    "exact definition of growth rate (slope of max error vs time)"
+   ],
+   "deferred_to": [],
+   "approach": "",
+   "assumptions": [],
+   "failed_attempts": [],
+   "obtained": [
+    2.5138808394359863e-11,
+    9.884735154483686e-17,
+    1.1058394611050219e-13
+   ],
+   "detail": "Energy error growth rates per period: 2.514e-11, 9.885e-17, 1.106e-13 for h=0.1, 0.05, 0.025.",
+   "script": "script.py",
+   "reproduced": true,
+   "matches_paper": true,
+   "sensitivity": [],
+   "verdict": "verified",
+   "decisive_assumptions": [],
+   "agreeing_digits": 2,
+   "confidence": "caveats",
+   "warnings": [
+    "Weak numeric evidence: the agreement covers only 2 significant digit(s) in total, which a wrong computation could also produce."
+   ]
+  },
+  {
+   "id": "C6",
+   "statement": "The Lobatto scheme for the harmonic oscillator is conditionally stable for h\u03c9 < sqrt(42 - 6*sqrt(29)) (approximately \u03c0).",
+   "location": "Section 4, equation (stabilityCondition) and discriminant analysis",
+   "exact_expression": "sqrt(42 - 6*sqrt(29))",
+   "kind": "numeric",
+   "needs_data": null,
+   "without_data": null,
+   "expected": "The critical h\u03c9 value for stability equals sqrt(42 - 6*sqrt(29))",
+   "expected_value": 3.112717648164218,
+   "tolerance": {
+    "type": "relative",
+    "value": 1e-06
+   },
+   "given_details": {
+    "scheme": "Lobatto symplectic scheme for harmonic oscillator",
+    "stability condition from": "\u03b4 = (h^2\u03c9^2-30)(h^2\u03c9^2-10) > 0 and discriminant \u0394 < 0",
+    "exact threshold derived": "h\u03c9 < sqrt(42 - 6*sqrt(29))"
+   },
+   "missing_details": [],
+   "deferred_to": [],
+   "exact": true,
+   "approach": "",
+   "assumptions": [],
+   "failed_attempts": [],
+   "obtained": 3.1127176481642236,
+   "detail": "Critical h\u03c9 where discriminant changes sign: 3.1127176482",
+   "script": "script_ref.py",
+   "reproduced": true,
+   "matches_paper": true,
+   "sensitivity": [],
+   "verdict": "verified",
+   "decisive_assumptions": [],
+   "built_on": "C1",
+   "agreeing_digits": 12,
+   "confidence": "high",
+   "warnings": []
+  },
+  {
+   "id": "C7",
+   "statement": "The discrete flow map \u03a6 of the Lobatto scheme for the harmonic oscillator has determinant exactly 1, making the scheme symplectic.",
+   "location": "Section 4, after equation (symplecticCoeffs): 'Let us remark that det \u03a6 = 1, so the discrete flow is symplectic'",
+   "exact_expression": "1",
+   "kind": "numeric",
+   "needs_data": null,
+   "without_data": null,
+   "expected": "det \u03a6 = 1",
+   "expected_value": 1.0,
+   "tolerance": {
+    "type": "relative",
+    "value": 1e-06
+   },
+   "given_details": {
+    "scheme": "Lobatto symplectic scheme (eq:symplecticSystem, eq:symplecticCoeffs)",
+    "matrix \u03a6": "1/\u03b4\u0303 [[a, b], [c, a]] with a,b,c,\u03b4\u0303 given in eq:symplecticCoeffs"
+   },
+   "missing_details": [],
+   "deferred_to": [],
+   "exact": true,
+   "approach": "",
+   "assumptions": [],
+   "failed_attempts": [],
+   "obtained": 1.0000000000000002,
+   "detail": "det \u03a6 = 1.000000000000000 (m=1.0, \u03c9=1.0, h=0.1)",
+   "script": "script.py",
+   "reproduced": true,
+   "matches_paper": true,
+   "sensitivity": [],
+   "verdict": "verified",
+   "decisive_assumptions": [],
+   "agreeing_digits": 12,
+   "confidence": "high",
+   "warnings": []
+  },
+  {
+   "id": "C8",
+   "statement": "The local truncation error of the Lobatto scheme for the harmonic oscillator is T_h(q_j) = -1/21600 \u03c9^8 h^6 q_j + O(h^8), confirming sixth-order accuracy.",
+   "location": "Section 4, after equation (discreteCenterEL): 'The scheme is sixth-order accurate on truncation error: T_h(q_j) = -1/21600 \u03c9^8 h^6 q_j + O(h^8)'",
+   "exact_expression": "-1/21600",
+   "kind": "numeric",
+   "needs_data": null,
+   "without_data": null,
+   "expected": "The leading truncation error coefficient is -1/21600",
+   "expected_value": -4.6296296296296294e-05,
+   "tolerance": {
+    "type": "relative",
+    "value": 1e-06
+   },
+   "given_details": {
+    "scheme": "Lobatto scheme discrete Euler-Lagrange equation (eq:discreteCenterEL)",
+    "method": "Taylor expansion of exact solution substituted into discrete equation"
+   },
+   "missing_details": [],
+   "deferred_to": [],
+   "exact": true,
+   "approach": "",
+   "assumptions": [],
+   "failed_attempts": [],
+   "obtained": -4.6296296296296294e-05,
+   "detail": "The leading truncation error coefficient is -0.000046296296296 (equals -1/21600).",
+   "script": "script.py",
+   "reproduced": true,
+   "matches_paper": true,
+   "sensitivity": [],
+   "verdict": "verified",
+   "decisive_assumptions": [],
+   "agreeing_digits": 12,
+   "confidence": "high",
+   "warnings": []
+  }
+ ],
+ "review": {
+  "title": "A variational symplectic scheme based on Lobatto's quadrature",
+  "year": 2025,
+  "summary": "The paper presents a variational integrator derived from Lobatto's quadrature (a four-point rule exact for polynomials up to degree five) combined with cubic Lagrange interpolation. The discrete Lagrangian is constructed for the harmonic oscillator and the nonlinear pendulum, internal degrees of freedom are eliminated via discrete Euler\u2013Lagrange equations, and the resulting one-step map is shown to be symplectic (unit determinant) and conditionally stable (h\u03c9 < \u221a(42\u22126\u221a29) \u2248 \u03c0). The scheme achieves sixth-order accuracy (superconvergence) for state, momentum, and energy in both test problems. Numerical results on the harmonic oscillator show near-exact energy conservation over 100,000 periods, and the nonlinear pendulum simulations confirm sixth-order convergence in the maximum norm.",
+  "strengths": [
+   {
+    "point": "Clear derivation of Lobatto's quadrature with explicit coefficients and proof of exactness for polynomials up to degree five.",
+    "quote": "Lobatto's quadrature (\\ref{eq:lobattoQuad}) is accurate for polynomials up to degree 2 n-3, where n is the number of integration points. In the present case n=4, so the proposed Lobatto quadrature is exact for the integration of polynomials up to degree five"
+   },
+   {
+    "point": "Detailed construction of the discrete Lagrangian for the harmonic oscillator, including explicit elimination of internal degrees of freedom and a rigorous stability analysis yielding a conditional stability bound.",
+    "quote": "The internal degrees of freedom q_\u03be and q_{1-\u03be} are eliminated by solving the system formed by the discrete Euler-Lagrange equations inside the interval, that is \u2202L_d/\u2202q_\u03be=0, \u2202L_d/\u2202q_{1-\u03be}=0. ... \u0394 < 0 when 0 < h \u03c9 < \u221a(42-6\u221a29). This restriction supersedes the previous stability condition ... Under this new restriction, two complex conjugate roots of unit module are obtained, guaranteeing numerical stability."
+   },
+   {
+    "point": "Sixth-order accuracy (superconvergence) demonstrated analytically for the harmonic oscillator and numerically for both the harmonic oscillator and the nonlinear pendulum, with tables showing the expected order of convergence for state, momentum, and energy.",
+    "quote": "The method is symplectic and conditionally stable. It uses cubic Lagrange polynomials for its internal interpolation and results to be sixth-order accurate for the state, the momentum, and the system energy (twice the order of the selected polynomials). This superconvergence is a characteristic of Galerkin variational integrators as remarked in \\cite{oberBlobaum2015,oberBlobaum2021}."
+   }
+  ],
+  "concerns": [
+   {
+    "severity": "minor",
+    "category": "evidence",
+    "point": "The claim that the method is 'conditionally stable' is only substantiated for the harmonic oscillator; no stability analysis is provided for the nonlinear pendulum, yet the conclusion states the method is conditionally stable in general.",
+    "quote": "The method is symplectic and conditionally stable. ... \u0394 < 0 when 0 < h \u03c9 < \u221a(42-6\u221a29). ... The method remains stable by using a little more than two points per period of oscillation in this case.",
+    "suggestion": "Either provide a stability analysis for the nonlinear pendulum or qualify the claim to apply only to the harmonic oscillator (or to linear systems)."
+   },
+   {
+    "severity": "minor",
+    "category": "clarity",
+    "point": "The abstract states the method 'preserves an approximate energy quantity,' but a discrete preserved energy is only explicitly constructed for the harmonic oscillator (H_d). For the nonlinear pendulum, only energy error norms are reported, not a preserved discrete Hamiltonian.",
+    "quote": "It preserves an approximate energy quantity. ... The method preserves a discrete Hamiltonian as remarked by \\cite{benettin1994}.",
+    "suggestion": "Clarify whether a discrete energy is exactly preserved for the nonlinear pendulum, or restrict the claim to the harmonic oscillator case."
+   }
+  ],
+  "dropped": 1,
+  "withdrawn": [
+   {
+    "point": "The paper cites \\cite{oberBlobaum2015} in the text (twice) but this reference is missing from the bibliography, making it impossible to verify the claimed prior publication of the harmonic oscillator scheme.",
+    "answer": "",
+    "why": "Checked in the LaTeX source by code: every reference has a label and every citation a bibliography entry.",
+    "by": "code"
+   },
+   {
+    "point": "The numerical setup for the nonlinear pendulum is not fully described: the caption of Figure 3 mentions 'N = 5 meshes over 5 periods' while Table 2 uses 50, 100, 200 meshes, and the error evolution figure uses h = 0.1, 0.05, 0.025 over 1e5 periods. The relationship between these parameters and how the nonlinear implicit equations are solved (e.g., Newton tolerance) is not given.",
+    "answer": "",
+    "why": "The concern incorrectly states that the nonlinear pendulum energy error figure uses 1e5 periods; the paper's Figure \\ref{fig:errorEvolutionNL} caption explicitly says 5e3 periods."
+   }
+  ],
+  "checklist": [
+   {
+    "item": "Data available or fully described",
+    "status": "partly",
+    "quote": "Errors in the maximum norm for the nonlinear pendulum simulation. The Lobatto integrator remains a sixth-order method in the nonlinear case. ... Over 1e5 periods, the \u2113\u221e energy error growth rate is of: 2.50e-11 when h=0.1, 5.39e-11 when h=0.05, and 5.33e-15 wh",
+    "note": "Summary error tables and energy growth rates are given, but raw simulation data (time series) are not provided."
+   },
+   {
+    "item": "Code available",
+    "status": "no",
+    "quote": "",
+    "note": "No mention of code availability or repository."
+   },
+   {
+    "item": "Method described fully enough to implement",
+    "status": "partly",
+    "quote": "",
+    "note": "The harmonic oscillator scheme is fully specified, but the nonlinear pendulum scheme references equations that are not in the text."
+   },
+   {
+    "item": "Parameters and settings given",
+    "status": "yes",
+    "quote": "",
+    "note": "Step-size stability bound, mesh counts, step sizes, and simulation durations are provided."
+   },
+   {
+    "item": "Hardware and software environment given",
+    "status": "no",
+    "quote": "",
+    "note": "No information about hardware, software, or programming language is provided."
+   },
+   {
+    "item": "Randomness controlled (seeds, repetitions)",
+    "status": "not applicable",
+    "quote": "",
+    "note": "The methods are deterministic; no stochastic elements are involved."
+   },
+   {
+    "item": "Variability reported (error bars, repeated runs)",
+    "status": "no",
+    "quote": "Errors in the maximum norm for the nonlinear pendulum simulation. ... Over 1e5 periods, the \u2113\u221e energy error growth rate is of: 2.50e-11 when h=0.1, 5.39e-11 when h=0.05, and 5.33e-15 when h=0.025.",
+    "note": "Only maximum-norm errors and single growth-rate values are reported; no repeated runs or error bars are shown."
+   },
+   {
+    "item": "Comparisons or baselines adequate",
+    "status": "yes",
+    "quote": "Comparison of the Lobatto symplectic scheme against the exact solution for N = 5 meshes over 5 periods. Lobatto's solutions remain very close to the exact ones. ... Comparable values for both the implicit midpoint and Simpson schemes can be found in \\cite{dubo",
+    "note": "The harmonic oscillator figure compares Lobatto, implicit midpoint, and Simpson against the exact solution; the nonlinear pendulum references prior comparisons."
+   },
+   {
+    "item": "Metrics defined",
+    "status": "yes",
+    "quote": "The scheme (\\ref{eq:discreteCenterEL}) is sixth-order accurate on truncation error: T_h(q_j) = -1/21600 \u03c9^8 h^6 q_j + O(h^8). ... Errors in the maximum norm for the nonlinear pendulum simulation. ... \u2113\u221e energy error growth rate",
+    "note": "Truncation error, maximum norm errors for state/momentum/energy, and \u2113\u221e energy error growth rate are clearly defined."
+   },
+   {
+    "item": "Limitations discussed",
+    "status": "partly",
+    "quote": "The method remains stable by using a little more than two points per period of oscillation in this case. ... The formulation of the integrator on multi-degrees of freedom nonlinear systems is left for future work. ... After completing this work, the authors no",
+    "note": "The stability restriction for the harmonic oscillator and the extension to multi-DOF systems are mentioned, but there is no dedicated limitations section discussing, e.g., stiffness, nonlinearity, or computational cost."
+   }
+  ],
+  "questions": [
+   "The stability analysis is only carried out for the harmonic oscillator; can the authors comment on the stability of the scheme for the nonlinear pendulum or for general nonlinear Hamiltonian systems?",
+   "The abstract claims the method 'preserves an approximate energy quantity.' For the nonlinear pendulum, is there a discrete energy that is exactly preserved by the map, or is the energy error merely observed to be small?",
+   "How are the implicit nonlinear equations for the pendulum solved in practice (e.g., Newton iteration, tolerance, initial guess), and what is the computational cost per step compared to the implicit midpoint or Simpson methods?"
+  ],
+  "consistency": []
+ },
+ "related": {
+  "queries": [
+   "variational integrator Lobatto quadrature",
+   "Lobatto quadrature four point degree five",
+   "variational integrator cubic Lagrange interpolation",
+   "discrete Lagrangian harmonic oscillator symplectic"
+  ],
+  "related": [
+   {
+    "title": "[0810.1548] Variational Integrators for Almost-Integrable Systems",
+    "url": "https://ar5iv.labs.arxiv.org/html/0810.1548",
+    "relation": "same method",
+    "note": "Derives variational integrators using Gauss-Lobatto quadrature to approximate the action integral, showing the Lobatto coefficients arise naturally in the discrete Lagrangian framework.",
+    "cited": false,
+    "year": 2008
+   },
+   {
+    "title": "Variational Integrators in Holonomic Mechanics",
+    "url": "https://www.mdpi.com/2227-7390/8/8/1358",
+    "relation": "same method",
+    "note": "Shows Galerkin variational integrators based on Lobatto quadrature are equivalent to constrained Lobatto partitioned Runge-Kutta methods, confirming the variational-Lobatto connection for constrained systems.",
+    "cited": false,
+    "year": null
+   },
+   {
+    "title": "Variational integrators for degenerate Lagrangians, with ...",
+    "url": "https://cwrowley.princeton.edu/papers/vortint.pdf",
+    "relation": "same method",
+    "note": "Proves variational integrators from discrete Lagrangians are symplectic via discrete fiber derivatives and discrete Euler-Lagrange equations, the same theoretical structure used in the paper.",
+    "cited": null,
+    "year": null
+   },
+   {
+    "title": "References",
+    "url": "https://arxiv.org/html/2406.16423v1",
+    "relation": "alternative approach",
+    "note": "Presents a symplectic Simpson variational scheme for the harmonic oscillator with explicit discrete Hamiltonian and verified unit determinant, a different quadrature-based variational integrator.",
+    "cited": null,
+    "year": 2024
+   },
+   {
+    "title": "Energy-preserving Variational Integrators for Forced ...",
+    "url": "https://www.aoe.vt.edu/content/dam/aoe_vt_edu/people/faculty/mpatil/HarshCNSNS.pdf",
+    "relation": "same method",
+    "note": "Constructs adaptive time-step variational integrators for forced Lagrangian systems using discrete Euler-Lagrange equations, demonstrating the same variational framework on a damped harmonic oscillator.",
+    "cited": null,
+    "year": null
+   }
+  ],
+  "assessment": "The paper's combination of Lobatto quadrature with cubic Lagrange interpolation to achieve sixth-order superconvergence for both state and energy appears novel; the search results confirm the variational-Lobatto framework is known, but not this specific quadrature-interpolation pairing or the conditional stability bound h\u03c9 < \u221a(42\u22126\u221a29). The superconvergence claim for nonlinear pendulum and 100,000-period energy conservation could not be verified from snippets alone.",
+  "paper_year": 2025
+ },
+ "figures": {
+  "1": "This is a line graph showing the evolution of momentum (p) and state (q) for a harmonic oscillator, comparing different numerical methods against the exact solution. ### Axes: - **X-axis**: Labeled with values 0, 0.2, 0.4, 0.6, 0.8, 1 (likely representing a normalized time or step parameter). - **Y-axis**: Labeled with angular values: \u2212\u03c0/2, \u2212\u03c0/4, 0, \u03c0/4, \u03c0/2 (radians). ### Legend (symbols and labels): - **p Exact**: Gray solid line (exact momentum solution). - **p Implicit midpoint**: Black triangle (implicit midpoint method for momentum). - **p Simpson**: Black diamond (Simpson\u2019s rule for momentum). - **p Lobatto**: Blue solid line with blue diamond markers (Lobatto symplectic scheme for momentum). - **q Exact**: Gray solid line (exact state solution). - **q Implicit midpoint**: Black triangle (implicit midpoint method for state). - **q Simpson**: Black diamond (Simpson\u2019s rule for state). - **q Lobatto**: Blue solid line with blue diamond markers (Lobatto symplectic scheme for state). ### Main Trend/Structure: The graph shows oscillatory behavior for both p and q, with the Lobatto method (blue lines) closely following the exact solutions (gray lines) for both momentum and state. The other methods (implicit midpoint, Simpson\u2019s rule) deviate more from the exact solutions. The momentum data (p) is noted to have been rescaled. ### Figure Caption: \"Figure 1: Harmonic oscillator evolution for the momentum p and state q. Comparison of the Lobatto symplectic scheme against the exact solution for N = 3 meshes. Lobatto\u2019s solutions are very close to the exact ones. Momentum data have been rescaled.\"",
+  "2": "This is a line graph titled \"\u2113\u221e energy error norm evolution (harmonic oscillator)\". The x-axis is labeled with the numbers 0, 50 000, and 100 000, representing the number of periods. The y-axis is labeled with the numbers 0, 2, 4, 6, and has the label \"\u00b710\u207b\u2075\" at the top, indicating the \u2113\u221e energy error norm in scientific notation. Three lines are shown: - A solid black line labeled \"h = 0.1 (max error: 6.87 \u00d7 10\u207b\u2075)\" - A dashed black line labeled \"h = 0.05 (max error: 1.10 \u00d7 10\u207b\u2076)\" - A dotted black line labeled \"h = 0.025 (max error: 3.04 \u00d7 10\u207b\u2078)\" The main trend is that all three lines are nearly flat (horizontal) across the x-axis range, indicating that the \u2113\u221e energy error norm does not increase significantly over the 100 000 periods shown. The solid line (h = 0.1) has the highest maximum error, followed by the dashed line (h = 0.05), then the dotted line (h = 0.025), as indicated by their respective max error values.",
+  "3": "This is a line graph comparing different numerical methods for simulating the nonlinear pendulum's momentum (p) and state (q) over time. ### Axes: - **X-axis**: Labeled with numbers 0 to 5, representing time or some dimensionless parameter (likely time units, as the context is pendulum evolution over 5 periods). - **Y-axis**: Ranges from \u2212\u03c0/2 to \u03c0/2, with tick marks at \u2212\u03c0/2, \u2212\u03c0/4, 0, \u03c0/4, \u03c0/2. ### Legend (lines/colors): - **p Exact**: Gray solid line (momentum exact solution). - **p Implicit midpoint**: Black triangle markers (momentum implicit midpoint method). - **p Simpson**: Black diamond markers (momentum Simpson method). - **p Lobatto**: Blue circle markers (momentum Lobatto method; note: \"rescaled\" per caption). - **q Exact**: Gray dashed line (state exact solution). - **q Implicit midpoint**: Black triangle markers (state implicit midpoint method). - **q Simpson**: Black diamond markers (state Simpson method). - **q Lobatto**: Blue circle markers (state Lobatto method). ### Main Trend/Structure: All methods (Lobatto, implicit midpoint, Simpson) closely follow the exact solutions (gray lines) for both p and q, forming periodic oscillations with peaks at \u03c0/2 and troughs at \u2212\u03c0/2. The Lobatto method (blue circles) is particularly close to the exact p and q, as noted in the caption. The momentum data (p) are rescaled, so their amplitude matches the state data (q). The oscillations repeat every 1 unit on the x-axis, consistent with 5 periods over the x-range 0\u20135. ### Caption: \"Figure 3: Nonlinear pendulum evolution for the momentum p and state q. Comparison of the Lobatto symplectic scheme against the exact solution for N = 5 meshes over 5 periods. Lobatto\u2019s solutions remain very close to the exact ones. Note that the momentum data have been rescaled.\"",
+  "4": "This is a scientific figure consisting of two main parts: a table at the top and a line graph below it, labeled \"Figure 4.\" **Table (Top):** - Title: \"Number of meshes 50 100 200 Order\" - Columns: \"Number of meshes\" (with values 50, 100, 200), \"Momentum p,\" \"State q,\" \"Energy H(p, q),\" and \"Order.\" - Rows under \"Momentum p\": 2.83 \u00d7 10\u207b\u2079, 4.57 \u00d7 10\u207b\u00b9\u00b9, 7.07 \u00d7 10\u207b\u00b9\u00b3, Order 6. - Rows under \"State q\": 4.22 \u00d7 10\u207b\u00b9\u2070, 6.69 \u00d7 10\u207b\u00b9\u00b2, 1.06 \u00d7 10\u207b\u00b9\u00b3, Order 6. - Rows under \"Energy H(p, q)\": 6.23 \u00d7 10\u207b\u00b9\u2070, 1.03 \u00d7 10\u207b\u00b9\u00b9, 1.59 \u00d7 10\u207b\u00b9\u00b3, Order 6. **Graph (Bottom):** - Title: \"\u2113\u221e energy error norm evolution (nonlinear pendulum)\" - X-axis label: \"Number of meshes\" with tick marks at 0, 50,000, 100,000. - Y-axis label: \"10\u207b\u2074 \u2113\u221e energy error norm\" with tick marks at 0, 2, 4. - Three lines: - Solid line: \"h = 0.1 (max error: 4.54 \u00d7 10\u207b\u2074)\" - Dashed line: \"h = 0.05 (max error: 1.27 \u00d7 10\u207b\u2075)\" - Dotted line: \"h = 0.025 (max error: 1.02 \u00d7 10\u207b\u2077)\" **Main Trend/Structure:** The graph shows the"
+ },
+ "data": "",
+ "coverage": {
+  "sections": [
+   {
+    "title": "1) \\quad  Introduction",
+    "claims": [],
+    "note": "Motivates the use of variational principles and symplectic integrators; no numerical results.",
+    "reason": "theory"
+   },
+   {
+    "title": "2) \\quad  Lobatto's Quadrature",
+    "claims": [],
+    "note": "Derives the Lobatto quadrature coefficients and states its polynomial exactness; no simulation results.",
+    "reason": "theory"
+   },
+   {
+    "title": "3) \\quad Cubic Interpolation",
+    "claims": [],
+    "note": "Defines the cubic Lagrange basis functions and their derivatives for the finite-element interpolation.",
+    "reason": "setup"
+   },
+   {
+    "title": "4) \\quad The Harmonic Oscillator Case",
+    "claims": [
+     "C6",
+     "C7",
+     "C8"
+    ],
+    "note": "Derives the discrete Lagrangian, Euler-Lagrange equations, stability condition, truncation error (sixth-order), symplecticity (det \u03a6 = 1), and discrete energy preservation for the harmonic oscillator.",
+    "reason": null
+   },
+   {
+    "title": "5) \\quad The Nonlinear Pendulum Case",
+    "claims": [],
+    "note": "Develops the nonlinear Lobatto scheme, discrete Euler-Lagrange equations, and proves symplecticity for the pendulum; no quantitative results.",
+    "reason": "theory"
+   },
+   {
+    "title": "6) \\quad Numerical Experiments",
+    "claims": [
+     "C1",
+     "C2",
+     "C3",
+     "C4",
+     "C5"
+    ],
+    "note": "Presents simulation results: Table 1 errors (C1\u2013C4), Figure 2 energy error growth rates (C5), and references Figure 3 and Table 2 (no claims extracted for those).",
+    "reason": null
+   },
+   {
+    "title": "5) \\quad Conclusions",
+    "claims": [],
+    "note": "Summarizes findings, notes prior publication of linear scheme, and states future work; no new numerical results.",
+    "reason": "theory"
+   }
+  ],
+  "items": [
+   {
+    "id": "T1",
+    "kind": "table",
+    "caption": "Errors in the maximum norm. The Lobatto approximation is sixth-order accurate and preserves a discrete energy. Comparable values from both the implicit midpoint and Simpson schemes can be found in \\ci",
+    "claims": [
+     "C1",
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "note": "Table of maximum-norm errors for harmonic oscillator (momentum, state, energy, discrete energy) with estimated order 6.",
+    "reason": null
+   },
+   {
+    "id": "T2",
+    "kind": "table",
+    "caption": "Errors in the maximum norm for the nonlinear pendulum simulation. The Lobatto integrator remains a sixth-order method in the nonlinear case. Comparable values for both the implicit midpoint and Simpso",
+    "claims": [],
+    "note": "Table of maximum-norm errors for nonlinear pendulum (momentum, state, energy) with estimated order 6; no claims extracted for these values.",
+    "reason": "limit"
+   },
+   {
+    "id": "F1",
+    "kind": "figure",
+    "caption": "Harmonic oscillator evolution for the momentum $ \\, p \\, $ and state $ \\, q $. Comparison of the Lobatto symplectic scheme against the exact solution for $N = 3$ meshes. Lobatto's solutions are very c",
+    "claims": [],
+    "note": "Plot of harmonic oscillator evolution (momentum and state) for N=3 meshes; visual comparison only.",
+    "reason": "figure"
+   },
+   {
+    "id": "F2",
+    "kind": "figure",
+    "caption": "Over $ \\num{1e5}$ periods, the $\\ell^\\infty$ energy error growth rate is of: \\num{2.50e-11} when $ \\, h=0.1$, \\num{5.45e-14} when $ \\, h=0.05$, and \\num{1.35e-13} when $ \\, h=0.025$.",
+    "claims": [
+     "C5"
+    ],
+    "note": "Caption gives \u2113^\u221e energy error growth rates over 1e5 periods for three step sizes.",
+    "reason": null
+   },
+   {
+    "id": "F3",
+    "kind": "figure",
+    "caption": "Nonlinear pendulum evolution for the momentum $ \\, p \\, $ and state $ \\, q $. Comparison of the Lobatto symplectic scheme against the exact solution for $N = 5$ meshes over 5 periods. Lobatto's soluti",
+    "claims": [],
+    "note": "Plot of nonlinear pendulum evolution (momentum and state) for N=5 meshes; visual comparison only.",
+    "reason": "figure"
+   },
+   {
+    "id": "F4",
+    "kind": "figure",
+    "caption": "Over $ \\num{5e3}$ periods, the $\\ell^\\infty$ energy error growth rate is of: \\num{7.99e-13} when $ \\, h=0.1$, \\num{5.39e-11} when $ \\, h=0.05$, and \\num{5.33e-15} when $ \\, h=0.025$.",
+    "claims": [],
+    "note": "Caption gives \u2113^\u221e energy error growth rates over 5e3 periods for three step sizes; no claims extracted for these values.",
+    "reason": "limit"
+   }
+  ]
+ },
+ "searches": [
+  {
+   "query": "A variational symplectic scheme based on Lobatto's quadrature source code repository",
+   "results": [
+    {
+     "title": "[2504.00560] A variational symplectic scheme based on Lobatto's quadrature",
+     "url": "https://arxiv.org/abs/2504.00560",
+     "content": "archive\n\n# Mathematics > Numerical Analysis\n\n# Title:A variational symplectic scheme based on Lobatto's quadrature\n\n|  |  |\n --- |\n| Subjects: | Numerical Analysis (math.NA) |\n| Cite as: | arXiv:2504.00560 [math.NA] |\n|  | (or  arXiv:2504.00560v3 [math.NA] for this version) |\n|  |  Focus to learn more  arXiv-issued DOI via DataCite |\n| Journal reference: | 7th International Conference on Geometric Science of Information, Oct 2025, Saint-Malo, France. pp.332-342 |\n\n## Submission history [...] ## Access Paper:\n\n### Current browse context:\n\n### References & Citations\n\n## BibTeX formatted citation\n\n### Bookmark\n\nBibSonomy\nReddit\n\n# Bibliographic and Citation Tools\n\n# Code, Data and Media Associated with this Article\n\n# Demos\n\n# Recommenders and Search Tools\n\n# arXivLabs: experimental projects "
+    },
+    {
+     "title": "A variational symplectic scheme based on Lobatto's quadrature: arxiv_math \u2014 LiveJournal",
+     "url": "https://arxiv-math.livejournal.com/24761541.html",
+     "content": "arXiv:2504.00560v3 Announce Type: replace Abstract: We present a variational integrator based on the Lobatto quadrature for the time integration of dynamical systems issued from the least action principle. This numerical method uses a cubic interpolation of the states and the action is approximated at each time step by Lobatto's formula. Numerical analysis is performed on both a harmonic oscillator and a nonlinear pendulum. The geometric scheme is conditionally stable, sixth-order accurate, and [...] ## LJ Video [...] Privacy Policy\n Conditions g\u00e9n\u00e9rales\n Recommendation technologies\n Aide\n\nLiveJournal  \u2014 v.940\n\nLiveJournal\n\nLiveJournal\n\n#### Log in\n\nNo account? Create an account\n\n\n:   [](\n\n# A variational symplectic scheme based on Lobatto's quadrature"
+    },
+    {
+     "title": "A variational symplectic scheme based on Lobatto's quadrature",
+     "url": "https://www.scilit.com/publications/afbdcdeeaf8a6551df589a5479793b64",
+     "content": "We present a variational integrator based on the Lobatto quadrature for the time integration of dynamical systems issued from the least action principle.This numerical method uses a cubic interpolation of the states and the action is approximated at each time step by Lobatto's formula. Numerical analysis is performed on a harmonic oscillator. The scheme is conditionally stable, sixth-order accurate, and symplectic. It preserves an approximateenergy quantity. Simulation results illustrate the [...] Symplectic integrators for Hamiltonian problems: an overviewActa Numerica, 1992 [...] Simpson\u2019s Variational Integrator for Systems with Quadratic LagrangiansAxioms, 2024 \n   Discrete mechanics and variational integratorsActa Numerica, 2001 \n   Algorithm 726: ORTHPOL\u2013a package of routines for gene"
+    },
+    {
+     "title": "A variational symplectic scheme based on Lobatto's ...",
+     "url": "https://arxiv.org/pdf/2504.00560",
+     "content": "4 A variational symplectic scheme based on Lobatto\u2019s quadrature The truncation order is obtained by replacing the discrete variables qj+1, , qj and qj\u22121 by the solution of the differential equation at tj + h, tj and tj \u2212h. Then ( qj+1 = qj + h dq dt + h2 2 d2q dt2 + h3 6 d3q dt3 + h4 24 d4q dt4 + h5 120 d5q dt5 + h6 720 d6q dt6 + O(h7) qj\u22121 = qj \u2212h dq dt + h2 2 d2q dt2 \u2212h3 6 d3q dt3 + h4 24 d4q dt4 \u2212h5 120 d5q dt5 + h6 720 d6q dt6 + O(h7) . [...] AMS classification: 65P10 PACS number: 02.60.-x Abstract We present a variational integrator based on the Lobatto quadrature for the time integration of dynamical systems issued from the least action principle. This numerical method uses a cubic interpolation of the states and the action is approximated at each time step by Lobatto\u2019s formula. Nume"
+    },
+    {
+     "title": "Symplectic P-stable additive Runge\u2014Kutta methods",
+     "url": "https://www.aimsciences.org/article/doi/10.3934/jcd.2021030",
+     "content": "Classical symplectic partitioned Runge\u2013Kutta methods can be obtained from a variational formulation where all the terms in the discrete Lagrangian are treated with the same quadrature formula. We construct a family of symplectic methods allowing the use of different quadrature formulas (primary and secondary) for different terms of the Lagrangian. In particular, we study a family of methods using Lobatto quadrature (with corresponding Lobatto IIIA-B symplectic pair) as a primary method and [...] primary method and Gauss\u2013Legendre quadrature as a secondary method. The methods have the same implicitness as the underlying Lobatto IIIA-B pair, and, in addition, they are P-stable, therefore suitable for application to highly oscillatory problems."
+    }
+   ]
+  },
+  {
+   "query": "variational symplectic scheme Lobatto quadrature paper constants",
+   "results": [
+    {
+     "title": "[2504.00560] A variational symplectic scheme based on Lobatto's quadrature",
+     "url": "https://arxiv.org/abs/2504.00560",
+     "content": "archive\n\n# Mathematics > Numerical Analysis\n\n# Title:A variational symplectic scheme based on Lobatto's quadrature\n\n|  |  |\n --- |\n| Subjects: | Numerical Analysis (math.NA) |\n| Cite as: | arXiv:2504.00560 [math.NA] |\n|  | (or  arXiv:2504.00560v3 [math.NA] for this version) |\n|  |  Focus to learn more  arXiv-issued DOI via DataCite |\n| Journal reference: | 7th International Conference on Geometric Science of Information, Oct 2025, Saint-Malo, France. pp.332-342 |\n\n## Submission history [...] ## Access Paper:\n\n### Current browse context:\n\n### References & Citations\n\n## BibTeX formatted citation\n\n### Bookmark\n\nBibSonomy\nReddit\n\n# Bibliographic and Citation Tools\n\n# Code, Data and Media Associated with this Article\n\n# Demos\n\n# Recommenders and Search Tools\n\n# arXivLabs: experimental projects "
+    },
+    {
+     "title": "A variational symplectic scheme based on Lobatto's quadrature: arxiv_math \u2014 LiveJournal",
+     "url": "https://arxiv-math.livejournal.com/22709656.html",
+     "content": "arXiv:2504.00560v2 Announce Type: replace Abstract: We present a variational integrator based on the Lobatto quadrature for the time integration of dynamical systems issued from the least action principle. This numerical method uses a cubic interpolation of the states and the action is approximated at each time step by Lobatto's formula. Numerical analysis is performed on both a harmonic oscillator and a nonlinear pendulum. The geometric scheme is conditionally stable, sixth-order accurate, and [...] accurate, and symplectic. It preserves an approximate energy quantity. Simulation results illustrate the performance and the superconvergence of the proposed method. [...] ## LJ Video"
+    },
+    {
+     "title": "A variational symplectic scheme based on Lobatto's quadrature",
+     "url": "https://www.scilit.com/publications/afbdcdeeaf8a6551df589a5479793b64",
+     "content": "We present a variational integrator based on the Lobatto quadrature for the time integration of dynamical systems issued from the least action principle.This numerical method uses a cubic interpolation of the states and the action is approximated at each time step by Lobatto's formula. Numerical analysis is performed on a harmonic oscillator. The scheme is conditionally stable, sixth-order accurate, and symplectic. It preserves an approximateenergy quantity. Simulation results illustrate the [...] Symplectic integrators for Hamiltonian problems: an overviewActa Numerica, 1992 [...] illustrate the performance of the proposed method."
+    },
+    {
+     "title": "A variational symplectic scheme based on Lobatto's quadrature | alphaXiv",
+     "url": "https://www.alphaxiv.org/abs/2504.00560",
+     "content": "We present a variational integrator based on the Lobatto quadrature for the time integration of dynamical systems issued from the least action principle. This numerical method uses a cubic interpolation of the states and the action is approximated at each time step by Lobatto's formula. Numerical analysis is performed on both a harmonic oscillator and a nonlinear pendulum. The geometric scheme is conditionally stable, sixth-order accurate, and symplectic. It preserves an approximate energy [...] approximate energy quantity. Simulation results illustrate the performance and the superconvergence of the proposed method. [...] AbstractPaper\n\nSubmitted 29 Oct 2025\n\n# A variational symplectic scheme based on Lobatto's quadrature\n\nUniversit\u00e9 Paris-SaclayConservatoire National des Arts et M\u00e9tiersT"
+    },
+    {
+     "title": "Symplectic P-stable additive Runge\u2014Kutta methods",
+     "url": "https://www.aimsciences.org/article/doi/10.3934/jcd.2021030",
+     "content": "Classical symplectic partitioned Runge\u2013Kutta methods can be obtained from a variational formulation where all the terms in the discrete Lagrangian are treated with the same quadrature formula. We construct a family of symplectic methods allowing the use of different quadrature formulas (primary and secondary) for different terms of the Lagrangian. In particular, we study a family of methods using Lobatto quadrature (with corresponding Lobatto IIIA-B symplectic pair) as a primary method and"
+    }
+   ]
+  },
+  {
+   "query": "Lobatto quadrature symplectic integrator mass parameter",
+   "results": [
+    {
+     "title": "A variational symplectic scheme based on Lobatto's quadrature",
+     "url": "https://www.scilit.com/publications/afbdcdeeaf8a6551df589a5479793b64",
+     "content": "We present a variational integrator based on the Lobatto quadrature for the time integration of dynamical systems issued from the least action principle.This numerical method uses a cubic interpolation of the states and the action is approximated at each time step by Lobatto's formula. Numerical analysis is performed on a harmonic oscillator. The scheme is conditionally stable, sixth-order accurate, and symplectic. It preserves an approximateenergy quantity. Simulation results illustrate the [...] Symplectic integrators for Hamiltonian problems: an overviewActa Numerica, 1992 [...] illustrate the performance of the proposed method."
+    },
+    {
+     "title": "Gauss-Lobatto quadrature",
+     "url": "https://www.johndcook.com/blog/2020/02/15/gauss-lobatto-quadrature",
+     "content": "2m\u2212 1\n\nor less. But if you use Lobatto quadrature, your m interior evaluations plus your two known values at the end points give you a total of m+2 function evaluations, and so can integrate polynomials of degree\n\n2(m + 2) \u2212 3 = 2m + 1\n\nor less exactly, two degrees higher than if we had used Gaussian quadrature. [...] ## Lobatto quadrature\n\nBy evaluating the integrand at n points, two of which are the end points, Lobatto\u2019s method exactly integrates polynomials of degree 2n-3.\n\nSuppose for whatever reason you already know the value of the integrand evaluated at the end points. You\u2019ve got m more function evaluations to spend. If you use those m points for Gaussian quadrature, you can exactly integrate polynomials of degree\n\n2m\u2212 1 [...] ```\ngauss_points = [ -0.906179845938664, -0.538469310105"
+    },
+    {
+     "title": "Lobatto Quadrature -- from Wolfram MathWorld",
+     "url": "https://mathworld.wolfram.com/LobattoQuadrature.html",
+     "content": "|  |  |  |  |\n ---  --- |\n| 3 | 0 | 0.00000 | 1.333333 |\n| 0.333333 |\n| 4 | 0.833333 |\n| 0.166667 |\n| 5 | 0 | 0.000000 | 0.711111 |\n| 0.544444 |\n| 0.100000 |\n| 6 | 0.554858 |\n| 0.378475 |\n| 0.066667 |\n\n## See also\n\nChebyshev Quadrature, Radau Quadrature\n\n## Explore with Wolfram|Alpha\n\nWolframAlpha\n\nMore things to try:\n\n 5, 12, 13 triangle\n chicken game\n inflection points (x^5+x^9-x-1)^3\n\n## References [...] |  |\n\n| (1) |\n\nThe free abscissas x_i for i=2, ..., n-1 are the roots of the polynomial P_(n-1)^'(x), where P(x) is a Legendre polynomial. The weights of the free abscissas are\n\n|  |\n\n| (2) |\n| (3) |\n\nand of the endpoints are\n\n|  |\n\n| (4) |\n\nThe error term is given by\n\n|  |\n\n| (5) |\n\nfor xi in (-1,1). Beyer (1987) gives a table of parameters up to n=11 and Chandrasekhar (1960) up to n=9"
+    },
+    {
+     "title": "Simpson variational integrator for nonlinear systems: a tutorial on the Lagrange top",
+     "url": "https://arxiv.org/html/2512.03330v1",
+     "content": "Simpson\u2019s quadrature can be regarded as part of the larger families of Lobatto IIIA and Lobatto IIIB collocation methods, in their respective fourth-order variants, which are symmetric integrators. Taken individually, these fail to preserve quadratic invariants and are not symplectic, the partitioned Runge-Kutta method based on the Lobatto IIIA\u2013IIIB pairs is symplectic . This Runge-Kutta method combines one scheme from each of the IIIA and IIIB families to solve separable systems (hence the [...] The proposed integrator is built by applying Simpson\u2019s quadrature to discretize the least action principle using the discrete Lagrangian as in [12, 11]. Lagrange finite elements in the \u21192\\mathbb{P}\\_{2}-space are used for interpolation. The resulting discrete Euler-Lagrange equations form an impli"
+    },
+    {
+     "title": "Symplectic integrator - Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Symplectic_integrator",
+     "content": "![{\\displaystyle {\\begin{aligned}p_{i}&=p_{i-1}+tc_{i}F(q_{i-1})\\\\[1ex]q_{i}&=q_{i-1}+td_{i}{\\frac {p_{i}}{m}}\\end{aligned}}}](\n\nwhere {\\displaystyle q} is the position, {\\displaystyle p} is the momentum, {\\displaystyle F(q)=-{\\tfrac {\\partial V}{\\partial q}}(q)} is the force vector at {\\displaystyle q}, and {\\displaystyle m} is the scalar quantity of mass.\n\nEquivalently, after converting into Lagrangian coordinates, each substep becomes [...] {\\displaystyle (q_{i-1},p_{i-1})\\mapsto (q_{i},p_{i})}: [...] |  |  |\n --- |\n| {\\displaystyle {\\begin{aligned}\\exp[t(D_{T}+D_{V})]&=\\prod _{i=k,\\dots ,1}\\exp(td_{i}D_{T})\\exp(tc_{i}D_{V})+O(t^{k+1})\\\\&=\\exp(td_{k}D_{T})\\exp(tc_{k}D_{V})\\cdots \\exp(td_{1}D_{T})\\exp(tc_{1}D_{V})+O(t^{k+1}),\\end{aligned}}} | 5 |"
+    }
+   ]
+  },
+  {
+   "query": "variational symplectic scheme growth rate definition continuous H",
+   "results": [
+    {
+     "title": "multisymplectic hamiltonian variational integrators",
+     "url": "https://par.nsf.gov/servlets/purl/10354968",
+     "content": "Proposition B.1. If the continuous Hamiltonian H is hyperregular and the associated Lagrangian L is constructed by the Legendre transform, then the Galerkin Hamiltonian variational integrator and the Galerkin Lagrangian variational integrator are equivalent, for the same choice of expansion (i.e., speci\ufb01ed by the basis functions \u03c8i, \u02dc \u03c8\u03b2 and quadrature rules). [...] Given a degenerate Hamiltonian, where the Legendre transform FH : T \u2217Q \u2192TQ, (q, p) &\u2192(q, \u2202H \u2202p ), is noninvertible, there is no equivalent Lagrangian formulation. Thus, a characterization of varia-tional integrators directly in terms of the continuous Hamiltonian is desirable. This is achieved by considering the Type II analogue of Jacobi\u2019s solution, given by H+,E d (qk, pk+1) = ext(q,p)\u2208C2([tk,tk+1],T \u2217Q) q(tk)=qk,p(tk+1)=pk+1"
+    },
+    {
+     "title": "Variational Integrators",
+     "url": "https://lagrange.mechse.illinois.edu/pubs/We2004/We2004.pdf",
+     "content": "Proof. Once again, we can use exactly the same proof as for Theorem 2.2 in the continuous case.\nThe only di\ufb00erence is that H need not be restricted to ensure that the lifted action is a special symplectic map.\nA Hamiltonian H : T \u2217Q \u2192R is said to be invariant under the cotangent lift of the action \u03a6 : G \u00d7 Q \u2192Q if H \u25e6\u03a6T \u2217Q g = H for all g \u2208G, in which case the action is said to be a symmetry for the Hamiltonian. [...] Unlike the continuous case, however, we will generally be interested in discrete Lagrangian sys-tems that do not exactly correspond to a given Hamiltonian system. In this case, the symplectic structures and momentum maps are related by pullback under the discrete Legendre transforms, but the \ufb02ow maps are not. As we will see later, this is a re\ufb02ection of the fact that discrete "
+    },
+    {
+     "title": "(PDF) On variational and symplectic time integrators for ...",
+     "url": "https://www.researchgate.net/publication/303620753_On_variational_and_symplectic_time_integrators_for_Hamiltonian_systems",
+     "content": "In this paper, a fi nite element method will be explored to derive symplectic time stepping schemes for (non-)autonomous systems in a systematic way. The"
+    },
+    {
+     "title": "Multi-symplectic integrator of the generalized KdV-type equation based on the variational principle",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6828693",
+     "content": "An explicit multi-symplectic scheme for the generalized KdV equation based on the Fourier pseudo-spectral method and the symplectic Euler scheme are constructed. Through a numerical examination, the explicit multi-symplectic Fourier pseudo-spectral scheme for the generalized KdV equation not only preserve the discrete global energy conservation law and the global momentum conservation law with high accuracy, but show long-time numerical stability as well. [...] The variational principle is used to construct a multi-symplectic structure of the generalized KdV-type equation. Accordingly, the local energy conservation law, the local momentum conservation law, and the Cartan form of the generalized KdV-type equation are given. An explicit multi-symplectic scheme for the generalized KdV equatio"
+    },
+    {
+     "title": "Midpoint rule as a variational-symplectic integrator: Hamiltonian systems  |  Phys. Rev. D",
+     "url": "https://link.aps.org/doi/10.1103/PhysRevD.73.024001",
+     "content": "Numerical algorithms based on variational and symplectic integrators exhibit special features that make them promising candidates for application to general relativity and other constrained Hamiltonian systems. This paper lays part of the foundation for such applications. The midpoint rule for Hamilton\u2019s equations is examined from the perspectives of variational and symplectic integrators. It is shown that the midpoint rule preserves the symplectic form, conserves Noether charges, and exhibits [...] and exhibits excellent long-term energy behavior. The energy behavior is explained by the result, shown here, that the midpoint rule exactly conserves a phase space function that is close to the Hamiltonian. The presentation includes several examples. [...] ## \n\n# Authorization Required\n\n## Log"
+    }
+   ]
+  }
+ ],
+ "sources": []
+}

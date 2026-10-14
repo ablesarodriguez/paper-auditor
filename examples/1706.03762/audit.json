@@ -1,0 +1,239 @@
+{
+ "title": "Attention Is All You Need",
+ "ingest_method": "arxiv-latex",
+ "claims": [],
+ "review": {
+  "title": "Attention Is All You Need",
+  "year": 2017,
+  "summary": "The paper proposes the Transformer, a sequence transduction architecture based entirely on self-attention mechanisms without recurrence or convolution. It employs an encoder-decoder stack of multi-head attention and position-wise feed-forward layers, with sinusoidal positional encodings. On WMT 2014 English-German and English-French translation, the Transformer achieves state-of-the-art BLEU scores (28.4 and 41.8) with substantially lower training cost than prior models. The authors also demonstrate generalization to English constituency parsing with both large and limited training data.",
+  "strengths": [
+   {
+    "point": "The architecture is described with sufficient detail to implement, including exact dimensions, residual connections, layer normalization, and the scaled dot-product and multi-head attention formulations.",
+    "quote": "Each layer has two sub-layers. The first is a multi-head self-attention mechanism, and the second is a simple, position-wise fully connected feed-forward network. We employ a residual connection around each of the two sub-layers, followed by layer normalization. That is, the output of each sub-layer is LayerNorm(x + Sublayer(x))."
+   },
+   {
+    "point": "A clear computational complexity analysis compares self-attention to recurrent and convolutional layers, showing constant sequential operations for self-attention versus linear for recurrence.",
+    "quote": "As noted in Table \\ref{tab:op_complexities}, a self-attention layer connects all positions with a constant number of sequentially executed operations, whereas a recurrent layer requires $O(n)$ sequential operations."
+   },
+   {
+    "point": "Strong empirical results on standard benchmarks with explicit training cost comparisons (FLOPs) against multiple strong baselines including ensembles.",
+    "quote": "On the WMT 2014 English-to-German translation task, the big transformer model outperforms the best previously reported models (including ensembles) by more than $2.0$ BLEU, establishing a new state-of-the-art BLEU score of $28.4$."
+   },
+   {
+    "point": "Ablation studies in Table 3 (variations) systematically test component choices such as number of heads, key/value dimensions, feed-forward size, dropout, and learned vs. sinusoidal positional encodings.",
+    "quote": "We also experimented with using learned positional embeddings instead, and found that the two versions produced nearly identical results (see Table~\\ref{tab:variations} row (E))."
+   },
+   {
+    "point": "The paper includes attention visualizations and notes that individual heads learn distinct, linguistically interpretable behaviors, suggesting a side benefit of interpretability.",
+    "quote": "Not only do individual attention heads clearly learn to perform different tasks, many appear to exhibit behavior related to the syntactic and semantic structure of the sentences."
+   }
+  ],
+  "concerns": [
+   {
+    "severity": "major",
+    "category": "completeness",
+    "point": "No random seeds are reported, and no variance across multiple training runs is shown. Results rely on single runs with checkpoint averaging, making it impossible to assess result stability.",
+    "quote": "For the base models, we used a single model obtained by averaging the last 5 checkpoints... For the big models, we averaged the last 20 checkpoints.",
+    "suggestion": "Report results over multiple random seeds (at least 3) with mean and standard deviation, or at minimum state the random seed used for reproducibility."
+   },
+   {
+    "severity": "minor",
+    "category": "evidence",
+    "point": "The claim that label smoothing 'hurts perplexity... but improves accuracy and BLEU score' is presented without supporting data (e.g., perplexity curves or ablation).",
+    "quote": "This hurts perplexity, as the model learns to be more unsure, but improves accuracy and BLEU score.",
+    "suggestion": "Provide a small ablation showing perplexity and BLEU with and without label smoothing, or cite a source that demonstrates this trade-off for the Transformer."
+   },
+   {
+    "severity": "minor",
+    "category": "clarity",
+    "point": "The parsing experiment uses a 4-layer, d_model=1024 Transformer, differing from both the base (6-layer, 512) and big (6-layer, 1024) translation models, without justification for the architecture change.",
+    "quote": "We trained a 4-layer transformer with $d_{model} = 1024$ on the Wall Street Journal (WSJ) portion of the Penn Treebank... about 40K training sentences.",
+    "suggestion": "Explain why a 4-layer model was chosen for parsing, or show that the standard 6-layer base model performs similarly."
+   },
+   {
+    "severity": "minor",
+    "category": "soundness",
+    "point": "The claim 'Convolutional layers are generally more expensive than recurrent layers, by a factor of k' is a broad generalization without citation or qualification (e.g., kernel size, separable convolutions).",
+    "quote": "Convolutional layers are generally more expensive than recurrent layers, by a factor of $k$.",
+    "suggestion": "Qualify the statement (e.g., 'for standard convolutions with kernel width k') and cite a complexity analysis, or remove the unqualified comparison."
+   }
+  ],
+  "dropped": 0,
+  "withdrawn": [
+   {
+    "point": "The abstract states the 28.4 BLEU result was achieved 'after training for 3.5 days on eight GPUs', but the body clarifies that the base model (which also surpasses prior work) trains in 12 hours, while the big model takes 3.5 days. The abstract conflates the two configurations.",
+    "answer": "",
+    "why": "The abstract attributes the 3.5-day training time to the 41.8 BLEU English-to-French result, not to the 28.4 BLEU English-to-German result; the referee's quoted conflation does not appear in the paper."
+   }
+  ],
+  "checklist": [
+   {
+    "item": "Data available or fully described",
+    "status": "partly",
+    "quote": "We trained on the standard WMT 2014 English-German dataset consisting of about 4.5 million sentence pairs... For English-French, we used the significantly larger WMT 2014 English-French dataset consisting of 36M sentences",
+    "note": "Standard public datasets are named and sized, but not released with the paper."
+   },
+   {
+    "item": "Code available",
+    "status": "yes",
+    "quote": "The code we used to train and evaluate our models is available at https://github.com/tensorflow/tensor2tensor",
+    "note": "Code repository explicitly provided."
+   },
+   {
+    "item": "Method described fully enough to implement",
+    "status": "yes",
+    "quote": "The Transformer follows this overall architecture using stacked self-attention and point-wise, fully connected layers for both the encoder and decoder... Each layer has two sub-layers... We employ a residual connection... followed by layer normalization.",
+    "note": "Architecture, attention formulas, positional encoding, optimizer, regularization, and hyperparameters are all specified."
+   },
+   {
+    "item": "Parameters and settings given",
+    "status": "yes",
+    "quote": "",
+    "note": "All key hyperparameters are listed."
+   },
+   {
+    "item": "Hardware and software environment given",
+    "status": "yes",
+    "quote": "We trained our models on one machine with 8 NVIDIA P100 GPUs.",
+    "note": "Hardware specified; software implied by tensor2tensor/TensorFlow reference."
+   },
+   {
+    "item": "Randomness controlled (seeds, repetitions)",
+    "status": "no",
+    "quote": "",
+    "note": "No random seeds reported; no multiple runs described."
+   },
+   {
+    "item": "Variability reported (error bars, repeated runs)",
+    "status": "no",
+    "quote": "",
+    "note": "Single training runs with checkpoint averaging; no variance estimates."
+   },
+   {
+    "item": "Comparisons or baselines adequate",
+    "status": "yes",
+    "quote": "ByteNet... Deep-Att + PosUnk... GNMT + RL... MoE... ConvS2S Ensemble... Transformer (base model)... Transformer (big)",
+    "note": "Compares against a range of strong contemporary models including ensembles."
+   },
+   {
+    "item": "Metrics defined",
+    "status": "yes",
+    "quote": "BLEU score... Training Cost (FLOPs)... WSJ 23 F1",
+    "note": "BLEU, FLOPs, and parsing F1 are clearly used."
+   },
+   {
+    "item": "Limitations discussed",
+    "status": "partly",
+    "quote": "To improve computational performance for tasks involving very long sequences, self-attention could be restricted to considering only a neighborhood of size $r$... We plan to investigate this approach further in future work.",
+    "note": "Acknowledges quadratic complexity for long sequences as a limitation and proposes a direction, but does not discuss other limitations (e.g., data efficiency, generalization beyond tested tasks)."
+   }
+  ],
+  "questions": [
+   "Would the base model (6-layer, 512-dim) achieve comparable parsing results to the 4-layer, 1024-dim model used in the constituency parsing experiment, and if not, why was the architecture changed for that task?"
+  ],
+  "consistency": [
+   {
+    "what": "28.4, quoted in the abstract, is also printed in the body of the paper",
+    "kind": "restated",
+    "expression": "28.4",
+    "computed": 28.4,
+    "stated": 28.4,
+    "consistent": true,
+    "quotes": [
+     "Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles, by over 2 BLEU.",
+     "| 27.3 | 38.1 | | \\multicolumn{2}{c}{\\boldmath$3.3\\cdot10^{18}$} | [T2.R12] | Transformer (big) | 28.4 | 41.8 | | \\multicolumn{2}{c"
+    ],
+    "by": "code"
+   },
+   {
+    "what": "41.8, quoted in the abstract, is also printed in the body of the paper",
+    "kind": "restated",
+    "expression": "41.8",
+    "computed": 41.8,
+    "stated": 41.8,
+    "consistent": true,
+    "quotes": [
+     "On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature.",
+     "| 38.1 | | \\multicolumn{2}{c}{\\boldmath$3.3\\cdot10^{18}$} | [T2.R12] | Transformer (big) | 28.4 | 41.8 | | \\multicolumn{2}{c}{$2.3\\"
+    ],
+    "by": "code"
+   },
+   {
+    "what": "3.5, quoted in the abstract, is also printed in the body of the paper",
+    "kind": "restated",
+    "expression": "3.5",
+    "computed": 3.5,
+    "stated": 3.5,
+    "consistent": true,
+    "quotes": [
+     "On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature.",
+     "e \\ref{tab:variations}), step time was 1.0 seconds. The big models were trained for 300,000 steps (3.5 days). \\subsection{Optimizer"
+    ],
+    "by": "code"
+   },
+   {
+    "what": "41.8 in the abstract and 41.0 in the body, both after \"score of\" in passages about the same thing (bleu, english, french, model, score)",
+    "kind": "restated",
+    "expression": "41.0",
+    "computed": 41.0,
+    "stated": 41.8,
+    "consistent": false,
+    "quotes": [
+     "to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days o",
+     "petitive models. On the WMT 2014 English-to-French translation task, our big model achieves a BLEU score of $41.0$, outperforming all of the pr"
+    ],
+    "by": "code"
+   },
+   {
+    "what": "Text says base models trained for 100,000 steps or 12 hours with step time 0.4 seconds on 8 GPUs",
+    "kind": "arithmetic",
+    "expression": "100000*0.4/3600",
+    "computed": 11.11111111111111,
+    "stated": 12.0,
+    "consistent": true,
+    "quotes": [
+     "each training step took about 0.4 seconds. We trained the base models for a total of 100,000 steps or 12 hours."
+    ]
+   },
+   {
+    "what": "Text says big model uses h=16 attention heads with d_k=d_v=d_model/h=64, Table 3 shows h=16, d_k=64, d_v=64 for big model",
+    "kind": "arithmetic",
+    "expression": "1024/16",
+    "computed": 64.0,
+    "stated": 64.0,
+    "consistent": true,
+    "quotes": [
+     "In this work we employ $h=8$ parallel attention layers, or heads. For each of these we use $d_k=d_v=\\dmodel/h=64$."
+    ]
+   }
+  ]
+ },
+ "related": {
+  "queries": [
+   "sequence transduction self-attention without recurrence convolution",
+   "multi-head attention encoder-decoder positional encoding",
+   "self-attention machine translation WMT English German French",
+   "scaled dot-product attention"
+  ],
+  "related": [
+   {
+    "title": "Re-Transformer: A Self-Attention Based Model for Machine Translation",
+    "url": "https://www.sciencedirect.com/science/article/pii/S1877050921011509",
+    "relation": "alternative approach",
+    "note": "Re-Transformer modifies the Transformer architecture for machine translation, reporting BLEU improvements of 4 and 17 points over the original on WMT 2014 En-De and En-Fr, directly benchmarking against this paper's results.",
+    "cited": false,
+    "year": null
+   }
+  ],
+  "assessment": "The single retrieved result is a later variant that explicitly targets the Transformer's translation benchmarks, confirming the paper's results as a standard reference point. No other retrieved works address the core architecture, the multi-head attention design, or the parsing generalization, so the breadth of the contribution cannot be judged from these snippets alone.",
+  "paper_year": 2017
+ },
+ "figures": {
+  "1": "This is a block diagram illustrating the architecture of the Transformer model. The diagram is organized vertically, showing the flow of data from inputs to outputs. ### Key Components and Labels: - **Bottom Left**: \"Inputs\" enter the model. - **Input Embedding**: A block where inputs are embedded. - **Positional Encoding**: Added to the input embedding (indicated by a \"+\" symbol). - **Multi-Head Attention**: A block labeled \"Multi-Head Attention\" with \"Add & Norm\" above it. - **Feed Forward**: A block labeled \"Feed Forward\" with \"Add & Norm\" above it. - **Middle**: The structure repeats \"Nx\" times (a vertical stack of the same blocks: \"Multi-Head Attention\" \u2192 \"Add & Norm\" \u2192 \"Feed Forward\" \u2192 \"Add & Norm\"). - **Bottom Right**: \"Outputs (shifted right)\" enter the model. - **Output Embedding**: A block where outputs are embedded. - **Positional Encoding**: Added to the output embedding (indicated by a \"+\" symbol). - **Masked Multi-Head Attention**: A block labeled \"Masked Multi-Head Attention\" with \"Add & Norm\" above it. - **Multi-Head Attention**: Another \"Multi-Head Attention\" block with \"Add & Norm\" above it. - **Feed Forward**: A \"Feed Forward\" block with \"Add & Norm\" above it. - **Top Right**: The sequence continues \"Nx\" times (same stacked blocks as the left side). - **Output Processing**: At the very top, the flow ends with \"Linear\" \u2192 \"Softmax\" \u2192 \"Output Probabilities\". ### Structure: The diagram is split into two parallel streams (left and right) that run through \"Nx\" identical layers (each containing \"Multi-Head Attention\" + \"Add & Norm\" + \"Feed Forward\" + \"Add & Norm\"). The left stream processes inputs (with positional encoding added first), while the right stream processes outputs (with positional encoding added last, and \"Masked Multi-Head Attention\" in the first layer of the right stream). The final",
+  "2": "This is a figure from a scientific paper showing two diagrams side by side, labeled \"Scaled Dot-Product Attention\" (left) and \"Multi-Head Attention\" (right). ### Left Panel (Scaled Dot-Product Attention): - **Structure**: A vertical flowchart with sequential blocks connected by arrows. - **Blocks (top to bottom)**: - \"MatMul\" (purple box, topmost). - \"SoftMax\" (green box). - \"Mask (opt.)\" (yellow box with \"Scale\" below it, connected by an arrow). - \"MatMul\" (purple box, bottommost). - **Inputs/Outputs**: \"Q\" (input to bottom MatMul), \"K\" (input to bottom MatMul), \"V\" (input to bottom MatMul). The output of the top MatMul points to the SoftMax block. ### Right Panel (Multi-Head Attention): - **Structure**: A horizontal flowchart with parallel layers and a central \"Scaled Dot-Product Attention\" block. - **Central Block**: \"Scaled Dot-Product Attention\" (purple box, labeled with \"h\" on the right side, indicating the number of heads). - **Inputs to Central Block**: Three \"Linear\" blocks (white boxes) connected to \"V\", \"K\", and \"Q\" respectively. - **Outputs from Central Block**: The output of \"Scaled Dot-Product Attention\" is split into three \"Linear\" blocks (white boxes), which then combine via a \"Concat\" (yellow box) and a \"Linear\" (white box) to produce the final output. ### Labels and Text: - Title above left panel: \"Scaled Dot-Product Attention\". - Title above right panel: \"Multi-Head Attention\". - Caption below the figure: \"Figure 2: (left) Scaled Dot-Product Attention. (right) Multi-Head Attention consists of several attention layers running in parallel.\" - Labels on left panel blocks: \"MatMul\", \"SoftMax\", \"Mask (opt.)\", \"Scale\", \"MatMul\". - Labels on right panel blocks:",
+  "3": "This figure is titled \"Attention Visualizations\" and is labeled as Figure 3 in the accompanying text. It consists of two identical horizontal panels stacked vertically, each displaying a sequence of words from a sentence. ### Axes and Structure: - **Horizontal axis**: Represents the sequence of words in the sentence. The words are: \"It is in this spirit that a majority of American governments have passed new laws since 2009 making the registration or voting process more difficult . <EOS> <pad> <pad> <pad> <pad> <pad> <pad>\". The sequence is repeated identically in both panels. - **Vertical axis**: Implied to represent the attention mechanism (not explicitly labeled with numerical values, but the structure shows attention \"heads\" as colored lines connecting words). ### Panels and Labels: Each panel contains the same sentence repeated twice (top and bottom rows of words). The words are aligned horizontally, with spaces between them. The sentence ends with \"<EOS>\" (End of Sentence) followed by six \"<pad>\" (Padding) tokens. ### Visual Elements: - **Colored lines (attention heads)**: Multiple colored lines connect the word \"making\" (purple line) to the phrase \"more difficult\" (pink lines), indicating attention from \"making\" to this distant dependency. Other words like \"process\" and \"registration\" also have lines connecting to \"making\" (e.g., brown and gray lines). The lines are color-coded, with different colors representing different attention heads (as noted in the figure caption: \"Different colors represent different heads\"). ### Main Trend: The figure illustrates how attention heads in the encoder self-attention mechanism (layer 5 of 6) focus on long-distance dependencies. Specifically, many attention heads attend to the verb \"making\" and its distant dependency on the phrase \"more difficult,\" completing the phrase \"making...more difficult.\" The colored lines visually highlight these connections. ### Text in the Figure: - Sentence text (top row): \"It is in this spirit that a majority of American governments have passed new laws since 2009 making the registration or voting process more difficult . <EOS> <pad",
+  "4": "This figure is a visualization of attention heads in a neural network, specifically for anaphora resolution. It consists of two panels (top and bottom), each showing attention connections between words in a sentence. **Top Panel (Full attentions for head 5):** - The x-axis and y-axis both display the same sequence of words: \"The Law will never be perfect , but its application should be just - this is what we are missing , in my opinion . <EOS> <pad>\" - The words are arranged in a grid, with each word connected by purple lines to other words, indicating attention weights. - The connections are dense and spread across the entire sequence, with some words (like \"its\" and \"application\") having many connections. **Bottom Panel (Isolated attentions from just the word \u2018its\u2019 for attention heads 5 and 6):** - The x-axis and y-axis display the same sequence of words as the top panel. - Only two attention lines are shown: one from \"its\" to \"Law\" (purple line), and one from \"its\" to \"application\" (brown line). - The rest of the sequence has no connections from \"its.\" **Labels and values:** - The x-axis and y-axis labels are the words from the sentence. - The figure has no numerical values; the attention is visualized by line thickness and presence. - The caption below the figure reads: \"Figure 4: Two attention heads, also in layer 5 of 6, apparently involved in anaphora resolution. Top: Full attentions for head 5. Bottom: Isolated attentions from just the word \u2018its\u2019 for attention heads 5 and 6. Note that the attentions are very sharp for this word.\" **Main trend or structure:** - The top panel shows broad, widespread attention across the entire sentence for attention head 5. - The bottom panel shows focused attention from the word \"its\" to \"Law\" and \"application,\" indicating specific relationships being highlighted by the attention mechanism.",
+  "5": "This figure consists of two stacked panels (top and bottom), each displaying a matrix-like visualization of attention heads from a neural network model. ### Axes and Structure: - **Horizontal axis (bottom row of each panel):** Words from the input sentence: \"The Law will never be perfect , but its application should be just - this is what we are missing , in my opinion . <EOS> <pad>\" (repeated across both panels). - **Vertical axis (left column of each panel):** The same sequence of words, serving as the \"query\" or \"target\" positions for attention. - **Lines connecting points:** Each line represents an attention \"head\" (a specific focus of the model's attention). Green lines in the top panel and red lines in the bottom panel show the attention patterns for different heads. ### Labels and Values: - The sentence words are labeled along both axes (e.g., \"The\", \"Law\", \"will\", \"never\", \"be\", \"perfect\", \"but\", \"its\", \"application\", \"should\", \"be\", \"just\", \"-\", \"this\", \"is\", \"what\", \"we\", \"are\", \"missing\", \",\", \"in\", \"my\", \"opinion\", \".\", \"<EOS>\", \"<pad>\"), with punctuation and special tokens included. - No numerical values are explicitly labeled on the axes or lines; the lines\u2019 thickness or presence indicates the strength or existence of attention between word pairs. ### Main Trend/Structure: - **Top panel (green lines):** Attention heads show widespread connections across the sentence, with some words (e.g., \"perfect\", \"missing\", \"opinion\") having multiple outgoing lines, suggesting they attend to many other words. - **Bottom panel (red lines):** Attention heads show more focused, sparse connections, with some words (e.g., \"never\", \"just\", \"what\") having fewer or more directed lines, indicating different attention patterns than the top panel. - Both panels illustrate how different attention heads (green vs. red) focus on different parts of the sentence structure, with lines forming a web-like pattern in the top panel and a more linear or clustered"
+ },
+ "data": ""
+}

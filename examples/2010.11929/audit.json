@@ -1,0 +1,234 @@
+{
+ "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+ "ingest_method": "arxiv-latex",
+ "claims": [],
+ "review": {
+  "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+  "year": 2021,
+  "summary": "The paper introduces the Vision Transformer (ViT), which applies a standard Transformer encoder directly to sequences of linearly embedded image patches for image classification. When pre-trained on large-scale datasets (ImageNet-21k, JFT-300M), ViT matches or exceeds state-of-the-art convolutional networks on multiple benchmarks while requiring substantially less pre-training compute. The authors conduct extensive scaling studies, attention analyses, and ablations, showing that ViT's performance improves with scale and that its self-attention learns global integration early. They also explore hybrid CNN-Transformer models and self-supervised pre-training, though the latter still lags behind supervised pre-training.",
+  "strengths": [
+   {
+    "point": "Clear and minimal method: the image is split into fixed-size patches, linearly embedded, combined with learnable 1D position embeddings, and processed by a standard Transformer encoder with a class token for classification.",
+    "quote": "We split an image into fixed-size patches, linearly embed each of them, add position embeddings, and feed the resulting sequence of vectors to a standard Transformer encoder."
+   },
+   {
+    "point": "Strong empirical results on multiple benchmarks, with the best model reaching 88.55% on ImageNet, 90.72% on ImageNet-ReaL, 94.55% on CIFAR-100, and 77.63% on the VTAB suite.",
+    "quote": "the best model reaches the accuracy of $88.55\\%$ on \\imagenet, $90.72\\%$ on \\imagenet-ReaL, $94.55\\%$ on CIFAR-100, and $77.63\\%$ on the VTAB suite of 19 tasks."
+   },
+   {
+    "point": "Demonstrates favorable performance/compute trade-off: ViT uses 2-4x less pre-training compute than ResNets to achieve the same transfer performance across five datasets.",
+    "quote": "ViTs dominate ResNets on the performance/compute trade-off. ViT uses approximately $2-4\\times$ less compute to attain the same performance (average over 5 datasets)."
+   },
+   {
+    "point": "Open-source release of fine-tuning code and pre-trained models enables reproducibility and further research.",
+    "quote": "Fine-tuning code and pre-trained models are available at \\url{https://github.com/google-research/vision_transformer}"
+   },
+   {
+    "point": "Insightful attention analysis showing that some heads attend globally even in low layers, and that attention distance increases with depth, confirming effective use of global self-attention.",
+    "quote": "Self-attention allows \\oursabbrv to integrate information across the entire image even in the lowest layers... some heads attend to most of the image already in the lowest layers, showing that the ability to integrate information globally is indeed used by the model."
+   }
+  ],
+  "concerns": [
+   {
+    "severity": "major",
+    "category": "evidence",
+    "point": "The claim that ViT 'approaches or beats state of the art' when pre-trained on the public ImageNet-21k dataset is not supported by the reported numbers: on ImageNet, ViT-L/16 achieves 85.30% vs BiT-L's 87.54%.",
+    "quote": "When pre-trained on the public ImageNet-21k dataset or the in-house JFT-300M dataset, \\oursabbrv{} approaches or beats state of the art on multiple image recognition benchmarks.",
+    "suggestion": "Clarify that on the public ImageNet-21k dataset ViT still trails the best CNN (BiT) on ImageNet, and reserve the 'beats state of the art' claim for the JFT-300M pre-training results."
+   },
+   {
+    "severity": "minor",
+    "category": "completeness",
+    "point": "The scaling study uses few-shot linear accuracy instead of full fine-tuning accuracy to save compute, but the correlation between few-shot and fine-tuned performance across model sizes is not established.",
+    "quote": "To save compute, we report few-shot linear accuracy instead of full fine-tuning accuracy.",
+    "suggestion": "Report at least a subset of fully fine-tuned results for the scaling study to validate that the compute-performance trends hold for the final metric."
+   },
+   {
+    "severity": "minor",
+    "category": "soundness",
+    "point": "The self-supervised pre-training experiment only improves ViT-B/16 by 2% over training from scratch, leaving a 4% gap to supervised pre-training, and no contrastive methods are explored.",
+    "quote": "With self-supervised pre-training, our smaller \\oursabbrv-B/16 model achieves 79.9\\% accuracy on \\imagenet{}, a significant improvement of 2\\% to training from scratch, but still 4\\% behind supervised pre-training.",
+    "suggestion": "Acknowledge the large gap more prominently and discuss why masked patch prediction underperforms relative to NLP-style masked language modeling."
+   },
+   {
+    "severity": "minor",
+    "category": "completeness",
+    "point": "Random seeds are not reported, making exact reproducibility of the training runs difficult despite averaging over three fine-tuning runs.",
+    "quote": "We report mean and standard deviation of the accuracies, averaged over three fine-tuning runs.",
+    "suggestion": "Include the random seeds used for each run in the appendix or code release."
+   },
+   {
+    "severity": "minor",
+    "category": "clarity",
+    "point": "The paper uses Adam for ResNet pre-training (unconventional) and only compares Adam vs SGD for ResNets, not for ViT; it is unclear if ViT also benefits from Adam over SGD.",
+    "quote": "Adam pre-training outperforms SGD pre-training on most datasets and on average. This justifies the choice of Adam as the optimizer used to pre-train ResNets on JFT.",
+    "suggestion": "Report whether ViT pre-training was also compared with SGD, or at least state that Adam was used for ViT based on prior NLP practice."
+   }
+  ],
+  "dropped": 0,
+  "withdrawn": [],
+  "checklist": [
+   {
+    "item": "Data available or fully described",
+    "status": "partly",
+    "quote": "We use the public ImageNet-21k dataset or the in-house JFT-300M dataset",
+    "note": "JFT-300M is not publicly available; ImageNet-21k and downstream benchmarks are public."
+   },
+   {
+    "item": "Code available",
+    "status": "yes",
+    "quote": "Fine-tuning code and pre-trained models are available at \\url{https://github.com/google-research/vision_transformer}",
+    "note": "Code and models released."
+   },
+   {
+    "item": "Method described fully enough to implement",
+    "status": "yes",
+    "quote": "We split an image into fixed-size patches, linearly embed each of them, add position embeddings, and feed the resulting sequence of vectors to a standard Transformer encoder.",
+    "note": "Architecture, patch embedding, position embedding, and classification head are fully specified."
+   },
+   {
+    "item": "Parameters and settings given",
+    "status": "yes",
+    "quote": "Table~\\ref{tbl:hparams-training} summarizes our training setups for our different models.",
+    "note": "Hyperparameters for pre-training and fine-tuning are provided in appendix tables."
+   },
+   {
+    "item": "Hardware and software environment given",
+    "status": "partly",
+    "quote": "All models were trained on TPUv3 hardware",
+    "note": "Hardware (TPUv3) mentioned; software framework (TensorFlow/JAX) not explicitly stated."
+   },
+   {
+    "item": "Randomness controlled (seeds, repetitions)",
+    "status": "no",
+    "quote": "",
+    "note": "No random seeds reported; only mention of averaging over three fine-tuning runs."
+   },
+   {
+    "item": "Variability reported (error bars, repeated runs)",
+    "status": "yes",
+    "quote": "We report mean and standard deviation of the accuracies, averaged over three fine-tuning runs.",
+    "note": "Standard deviations shown in main tables (e.g., 88.55\u00b10.04)."
+   },
+   {
+    "item": "Comparisons or baselines adequate",
+    "status": "yes",
+    "quote": "",
+    "note": "Multiple strong baselines (ResNets, BiT, Noisy Student, axial variants) across datasets."
+   },
+   {
+    "item": "Metrics defined",
+    "status": "yes",
+    "quote": "Fine-tuning accuracies capture the performance... Few-shot accuracies are obtained by solving a regularized least-squares regression problem...",
+    "note": "Top-1 accuracy, few-shot linear accuracy, and top-5 accuracy (ObjectNet) are defined."
+   },
+   {
+    "item": "Limitations discussed",
+    "status": "partly",
+    "quote": "While these initial results are encouraging, many challenges remain. One is to apply \\oursabbrv to other computer vision tasks... Another challenge is to continue exploring self-supervised pre-training methods... Finally, further scaling of \\oursabbrv{} would ",
+    "note": "Future challenges listed, but no explicit discussion of current limitations (e.g., reliance on private JFT-300M, few-shot proxy, self-supervised gap)."
+   }
+  ],
+  "questions": [
+   "How well does the few-shot linear accuracy correlate with full fine-tuning accuracy across the model sizes in the scaling study? Would the compute-performance trade-off change if all models were fully fine-tuned?",
+   "The paper uses Adam for both ViT and ResNet pre-training. Was SGD ever tried for ViT pre-training, and if not, why was Adam chosen for ViT beyond following NLP practice?",
+   "The positional embedding ablation shows little difference between 1D and 2D embeddings at the ViT-B/16 scale. Were 2D positional embeddings tested at larger scales (e.g., ViT-H/14) where the grid is finer?",
+   "The JFT-300M dataset is critical for the best results but is not public. Are there plans to release it or a representative subset to enable full reproducibility?"
+  ],
+  "consistency": [
+   {
+    "what": "Average row, column \"ResNet50\", of the table captioned \"Fine-tuning ResNet models pre-trained with Adam and SGD.\"",
+    "kind": "table",
+    "expression": "(77.54 + 97.67 + 86.07 + 91.11 + 94.26) / 5",
+    "computed": 89.33,
+    "stated": 89.33,
+    "consistent": true,
+    "quotes": [
+     "Average | $89.33$ | $88.79$ | $94.01$ | $93.72$"
+    ],
+    "by": "code"
+   },
+   {
+    "what": "Average row, column \"ResNet152x2\", of the table captioned \"Fine-tuning ResNet models pre-trained with Adam and SGD.\"",
+    "kind": "table",
+    "expression": "(78.24 + 97.46 + 85.17 + 91 + 92.06) / 5",
+    "computed": 88.786,
+    "stated": 88.79,
+    "consistent": true,
+    "quotes": [
+     "Average | $89.33$ | $88.79$ | $94.01$ | $93.72$"
+    ],
+    "by": "code"
+   },
+   {
+    "what": "Average row, column \"column 4\", of the table captioned \"Fine-tuning ResNet models pre-trained with Adam and SGD.\"",
+    "kind": "table",
+    "expression": "(84.97 + 99.06 + 92.05 + 95.37 + 98.62) / 5",
+    "computed": 94.014,
+    "stated": 94.01,
+    "consistent": true,
+    "quotes": [
+     "Average | $89.33$ | $88.79$ | $94.01$ | $93.72$"
+    ],
+    "by": "code"
+   },
+   {
+    "what": "Average row, column \"column 5\", of the table captioned \"Fine-tuning ResNet models pre-trained with Adam and SGD.\"",
+    "kind": "table",
+    "expression": "(84.37 + 99.07 + 91.06 + 94.79 + 99.32) / 5",
+    "computed": 93.72200000000001,
+    "stated": 93.72,
+    "consistent": true,
+    "quotes": [
+     "Average | $89.33$ | $88.79$ | $94.01$ | $93.72$"
+    ],
+    "by": "code"
+   }
+  ]
+ },
+ "related": {
+  "queries": [
+   "vision transformer image classification patches",
+   "transformer encoder image patches linear embedding",
+   "vision transformer large scale pretraining imagenet",
+   "transformer self attention computer vision"
+  ],
+  "related": [
+   {
+    "title": "Billion-Scale Pretraining With Vision Transformers for Multi- ...",
+    "url": "https://openaccess.thecvf.com/content/WACV2022/papers/Beal_Billion-Scale_Pretraining_With_Vision_Transformers_for_Multi-Task_Visual_Representations_WACV_2022_paper.pdf",
+    "relation": "builds on it",
+    "note": "This work adopts the ViT-B/16 backbone introduced in the paper to demonstrate the benefits of billion-scale pretraining for multi-task visual representations.",
+    "cited": null,
+    "year": null
+   },
+   {
+    "title": "Self-attention as the backbone: A survey on Vision Transformers",
+    "url": "https://www.sciencedirect.com/science/article/pii/S107731422600158X",
+    "relation": "same problem",
+    "note": "This survey paper reviews Vision Transformers, positioning the ViT architecture as the foundational work that propelled self-attention as a scalable backbone for computer vision.",
+    "cited": false,
+    "year": null
+   }
+  ],
+  "assessment": "The search results confirm the paper's foundational status: one result directly builds on the ViT-B/16 architecture for billion-scale pretraining, while the other is a survey citing ViT as the catalyst for the vision transformer paradigm. The snippets do not reveal direct methodological predecessors or concurrent alternative pure-transformer approaches, so the novelty of applying a standard NLP Transformer directly to image patches cannot be fully judged from these results alone.",
+  "paper_year": 2020
+ },
+ "figures": {
+  "1": "This is a block diagram illustrating the architecture of a Vision Transformer (ViT) model, published as a conference paper at ICLR 2021. ### Left Panel (Main Vision Transformer Structure): - **Top Left**: A box labeled \"Class\" with sub-labels \"Bird\", \"Ball\", \"Car\" (representing classification categories). - **MLP Head**: A box labeled \"MLP Head\" connected to the \"Class\" box. - **Transformer Encoder**: A large rectangular block labeled \"Transformer Encoder\". - **Input to Encoder**: A sequence of 10 numbered boxes (0 to 9) representing \"Linear Projection of Flattened Patches\". Each box is connected to a small image patch (e.g., a grid of squares) labeled \"Patch + Position Embedding\". - **Extra Embedding**: A box labeled \"Extra learnable [class] embedding\" (with \"class\" in brackets) is connected to the \"MLP Head\" and the \"Transformer Encoder\" input sequence. ### Right Panel (Transformer Encoder Details): - **Embedded Patches**: A pink box labeled \"Embedded Patches\" at the bottom, connected upward to the \"Transformer Encoder\". - **Encoder Components**: Inside the \"Transformer Encoder\" block, there are three vertical components stacked: - \"Multi-Head Attention\" (green box) with \"Norm\" (yellow box) above and below it. - \"MLP\" (blue box) with \"Norm\" (yellow box) above and below it. - \"Norm\" (yellow box) at the top, connected to a \"+\" symbol labeled \"L x\" (likely indicating layer scaling). ### Labels and Values: - Numbers \"0\" to \"9\" above the linear projection boxes. - Text labels: \"Patch + Position Embedding\", \"Linear Projection of Flattened Patches\", \"Extra learnable [class] embedding\", \"MLP Head\", \"Transformer Encoder\", \"Multi-Head Attention\", \"MLP\", \"Norm\", \"Embedded Patches\", \"L x\". ### Main Structure: The diagram shows how an image is split",
+  "2": "This is a bar chart with four panels, each representing a different task group: VTAB (19 tasks), Natural (7 tasks), Specialized (4 tasks), and Structured (8 tasks). Each panel displays the accuracy (in percentage) of four different models: ViT-H/14 (blue), BiT-L (R152x4) (purple), VIVI-Ex-100% (R50x3) (green), and S4L (R50x1) (orange). ### Axes and Labels: - **Y-axis**: Labeled \"Accuracy [%]\" with tick marks at 65, 70, 75, and 80. - **X-axis**: Each panel has a title indicating the task group: \"VTAB (19 tasks)\", \"Natural (7 tasks)\", \"Specialized (4 tasks)\", \"Structured (8 tasks)\". ### Panels and Model Bars: - **VTAB (19 tasks)**: - ViT-H/14 (blue): Tallest bar, slightly above 78%. - BiT-L (R152x4) (purple): Slightly shorter than ViT-H/14, around 77%. - VIVI-Ex-100% (R50x3) (green): Shorter than BiT-L, around 70%. - S4L (R50x1) (orange): Shortest bar, around 67%. - **Natural (7 tasks)**: - ViT-H/14 (blue): Tallest bar, around 78%. - BiT-L (R152x4) (purple): Slightly shorter than ViT-H/14, around 77%. - VIVI-Ex-100% (R50x3) (green): Shorter than BiT-L, around 70%. - S4L (R50x1) (orange): Shortest bar, around 67%.",
+  "3": "This is a line graph showing the performance of different vision transformer (ViT) models and a BiT model on the ImageNet Top-1 accuracy as a function of the size of the pre-training dataset. ### Axes: - **X-axis**: \"Pre-training dataset\", with three categories: \"ImageNet\", \"ImageNet-21k\", and \"JFT-300M\". - **Y-axis**: \"ImageNet Top1 Accuracy [%]\", ranging from 70% to 90%. ### Data Series: There are five lines, each representing a different model: - **BiT**: A gray line with square markers. - **ViT-B/32**: A blue line with circle markers. - **ViT-B/16**: A pink line with triangle markers. - **ViT-L/32**: A green line with diamond markers. - **ViT-L/16**: A light blue line with pentagon markers. - **ViT-H/14**: An orange line with a circle marker (appears as a dot at the highest point). ### Key Labels and Values: - The Y-axis has tick marks at 70, 75, 80, 85, and 90. - The X-axis labels are \"ImageNet\", \"ImageNet-21k\", and \"JFT-300M\". - The legend lists the model names with their corresponding marker shapes/colors. ### Main Trend/Structure: All models show an upward trend in accuracy as the pre-training dataset size increases from ImageNet to JFT-300M. Larger ViT variants (e.g., ViT-H/14, ViT-L/32) generally achieve higher accuracy than smaller ones (e.g., ViT-B/16, ViT-B/32) at larger dataset sizes. The BiT model (gray line) starts with the highest accuracy on ImageNet but is overtaken by larger ViT variants (e.g., ViT-H/14) on JFT-300M. The",
+  "4": "This is a line graph showing the performance of different neural network models on the ImageNet dataset after linear few-shot evaluation, plotted against the number of pre-training samples from the JFT dataset. **Axes**: - The x-axis is labeled \"Number of JFT pre-training samples\" and shows tick marks at 10 M, 30 M, 100 M, and 300 M. - The y-axis is labeled \"Linear 5-shot ImageNet Top1 [%]\" and shows tick marks at 30, 40, 50, 60, 70. **Lines/Models**: - There are five distinct lines, each representing a different model: - **ViT-L/16**: Blue line with circle markers. - **ViT-L/32**: Green line with triangle markers. - **ViT-B/32**: Blue line with square markers. - **ViT-b/32**: Green line with diamond markers. - **ResNet50x1 (BiT)**: Blue line with cross markers. - **ResNet152x2 (BiT)**: Gray line with square markers. **Trends**: - For **ResNet50x1 (BiT)** and **ResNet152x2 (BiT)** (gray lines), performance increases slightly with pre-training samples but plateaus around 50\u201360% Top1 accuracy. - For **ViT-L/16** and **ViT-L/32** (blue and green lines with circles/triangles), performance improves more steeply with pre-training, reaching ~60\u201370% Top1 at 300 M samples. - For **ViT-B/32** and **ViT-b/32** (blue and green lines with squares/diamonds), performance also increases with pre-training, with ViT-b/32 (green diamonds) showing a higher final accuracy than ViT-B/32 (blue squares) at large pre-training sizes. **Figure",
+  "5": "This figure consists of two side-by-side scatter plots, each with a title, axes, and colored data points representing different architectures. ### Left Panel (Average-5): - **Title**: \"Average-5\" (top center). - **X-axis**: \"Total pre-training compute [exaFLOPs]\" with tick marks at 10\u00b2 and 10\u00b3. - **Y-axis**: \"Transfer accuracy [%]\" with tick marks at 75, 80, 85, 90, and 95. - **Data points**: Three types of markers: - Blue circles: \"Transformer (ViT)\" (some points near 90\u201395% accuracy at 10\u00b2\u201310\u00b3 exaFLOPs). - Gray squares: \"ResNet (BiT)\" (points clustered around 80\u201390% accuracy at 10\u00b2\u201310\u00b3 exaFLOPs). - Orange crosses: \"Hybrid\" (points near 90\u201395% accuracy at 10\u00b2\u201310\u00b3 exaFLOPs). ### Right Panel (ImageNet): - **Title**: \"ImageNet\" (top center). - **X-axis**: \"Total pre-training compute [exaFLOPs]\" with tick marks at 75, 10\u00b2, and 10\u00b3. - **Y-axis**: \"Transfer accuracy [%]\" with tick marks at 75, 80, 85, 90, and 90 (note: the top tick is 90, not 95 as in Average-5). - **Data points**: Same three types of markers as the left panel: - Blue circles: \"Transformer (ViT)\" (points near 85\u201390% accuracy at 75\u201310\u00b3 exaFLOPs). - Gray squares: \"ResNet (BiT)\" (points around 80\u201385% accuracy at 75\u201310\u00b3 exaFLOPs).",
+  "6": "This figure is a composite of four panels arranged in a 2x2 grid, labeled \"Input\" and \"Attention\" at the top. ### Top-left panel (Input): A color photograph of a golden retriever lying outdoors on grass, with trees and a blue sky in the background. ### Top-right panel (Attention): A dark, grayscale heatmap overlay on the same dog image, showing areas of attention (brighter regions indicate higher attention). ### Bottom-left panel (Input): A color photograph of a white and gray bird (possibly a seagull) perched on a rocky surface with a cloudy sky in the background. ### Bottom-right panel (Attention): A dark, grayscale heatmap overlay on the same bird image, highlighting areas of attention (brighter regions indicate higher attention). ### Labels and text: - At the top of the figure: \"Input\" (left) and \"Attention\" (right). - Below the panels: \"Figure 6: Representative examples of attention from the output token to the input space. See Appendix D.7 for details.\" - Surrounding the figure: Partial text from the paper (e.g., \"mer processes im-\", \"The first layer of ned patches into a hows the top prin- filters. The com- low-dimensional tch.\", \"ng is added to the t the model learns ty of position em- milar position em- ars; patches in the nally, a sinusoidal Appendix D). That mage topology ex- riants do not yield n across the entire e to what degree cally, we compute ch information is re 7, right). This eld size in CNNs\"). ### Main structure: The figure pairs input images (top-left, bottom-left) with corresponding attention heatmaps (top-right, bottom-right), illustrating where the model focuses attention on the input images.",
+  "7": "This figure consists of three main panels, each illustrating different aspects of Vision Transformer (ViT) models: **Left Panel:** - Title: \"RGB embedding filters (first 28 principal components)\" - Shows a grid of 28 small grayscale images arranged in 4 rows and 7 columns. - Each image appears to be a filter or component of the initial linear embedding of RGB values for a ViT-L/32 model. **Center Panel:** - Title: \"Position embedding similarity\" - Shows a grid of 49 small colored tiles arranged in 7 rows and 7 columns. - Each tile is labeled with a number (1 to 7) in both the row and column, indicating the position of a patch in the input image. - The color of each tile ranges from blue to green to yellow to red, representing cosine similarity values from -1 to 1. - The legend on the right side shows a color bar labeled \"Cosine similarity\" with values from -1 to 1. **Right Panel:** - Title: \"ViT-L/16\" - Shows a scatter plot with two axes: - X-axis: \"Network depth (layer)\" with values ranging from 0 to 120. - Y-axis: \"Mean attention distance (pixels)\" with values ranging from 0 to 20. - The plot contains three groups of colored dots, each representing a different \"Head\" (Head 1, Head 2, Head 3, etc.). - The dots are colored blue, green, and red, corresponding to the different heads. **Figure Caption:** - \"Figure 7: Left: Filters of the initial linear embedding of RGB values of ViT-L/32. Center: Similarity of position embeddings of ViT-L/32. Tiles show the cosine similarity between the position embedding of the patch with the indicated row and column and the position embeddings of all other patches. Right: Size of attended area by head and network depth. Each dot shows the mean attention distance across images for one of 16 heads at one layer. See Appendix D.7 for details.\" The main trends visible are: -",
+  "8": "This figure consists of two side-by-side line plots, each with a legend and labeled axes. ### Left Panel: - **Title/Label**: \"ImageNet 5shot\" (y-axis label). - **X-axis**: \"Relative Compute\" (logarithmic scale, ranging from 10^0 to 10^1). - **Y-axis**: Values from 0.2 to 0.6 (linear scale). - **Legend**: \"Models\" with five categories: \"All\" (blue solid line with circle markers), \"Depth\" (orange dashed line with cross markers), \"Patch size\" (green dashed line with square markers), \"Width MLP\" (orange dashed line with diamond markers), \"Width\" (purple dashed line with pentagon markers). - **Main Trend**: All lines show an upward trend as \"Relative Compute\" increases, with \"All\" (blue) reaching the highest y-value (~0.6) at the highest x-value (10^1), followed by \"Width\" (purple), \"Patch size\" (green), \"Width MLP\" (orange diamonds), and \"Depth\" (orange crosses) at lower y-values. ### Right Panel: - **Title/Label**: \"Average 5shot\" (y-axis label). - **X-axis**: \"Relative Compute\" (same logarithmic scale as left panel, 10^0 to 10^1). - **Y-axis**: Values from 0.4 to 0.8 (linear scale). - **Legend**: Same five categories as left panel (\"Models\" with \"All,\" \"Depth,\" \"Patch size,\" \"Width MLP,\" \"Width\"). - **Main Trend**: Similar upward trend as left panel, with \"All\" (blue) reaching the highest y-value (~0.8) at the highest x-value (10^1), followed by \"Width\" (purple), \"Patch size\" (green), \"Width MLP\" (orange diamonds), and \"Depth\" (orange crosses) at lower y-values. ### Figure Caption: \"Figure 8: Scaling different model dimensions of the Vision Transformer",
+  "9": "This is a line graph comparing the performance of two different classification methods over time. **Axes**: - The x-axis is labeled \"Epochs of training\" and ranges from 0 to 7. - The y-axis is labeled \"ImageNet linear 5-shot accuracy [%]\" and ranges from 25% to 60%. **Lines/Blocks**: There are three lines, each representing a different method: 1. **Blue line**: Labeled \"CLS-Token, lr=8e-4\" (class-token with learning rate 8e-4). 2. **Green line**: Labeled \"GAP, lr=8e-4\" (global average pooling with learning rate 8e-4). 3. **Orange line**: Labeled \"GAP, lr=3e-4\" (global average pooling with learning rate 3e-4). **Trends**: All three lines show an upward trend in accuracy as training epochs increase. The green line (GAP, lr=8e-4) is the highest at all points, followed by the blue line (CLS-Token, lr=8e-4), then the orange line (GAP, lr=3e-4). The gap between the methods narrows slightly as training progresses, but the green line consistently outperforms the others. **Text**: - \"Published as a conference paper at ICLR 2021\" is printed at the top. - \"Figure 9: Comparison of class-token and global average pooling classifiers. Both work similarly well, but require different learning-rates.\" is printed below the graph.",
+  "10": "This figure consists of three heatmaps arranged horizontally, each representing position embeddings for a Vision Transformer (ViT-L16) model trained with different hyperparameters. ### Left Panel: - **Title**: \"ViT-L16 7 epochs, LR=0.0002, WD=0.01\" - **Axes**: - X-axis: \"Input patch column\" (labeled with numbers 1 to 14). - Y-axis: \"Input patch row\" (labeled with numbers 1 to 14). - **Content**: A grid of 14x14 squares, each filled with a color from the \"Cosine similarity\" color bar (ranging from dark blue to yellow, with yellow indicating higher similarity). All squares appear uniformly colored (likely a mid-tone green, consistent with the color bar\u2019s mid-range). ### Middle Panel: - **Title**: \"ViT-L16 7 epochs, LR=0.0004, WD=0.1\" - **Axes**: - X-axis: \"Input patch column\" (1 to 14). - Y-axis: \"Input patch row\" (1 to 14). - **Content**: Another 14x14 grid with uniform color (similar mid-tone green as the left panel), matching the color bar\u2019s mid-range. ### Right Panel: - **Title**: \"ViT-L16 14 epochs, LR=0.0004, WD=0.1\" - **Axes**: - X-axis: \"Input patch column\" (1 to 14). - Y-axis: \"Input patch row\" (1 to 14). - **Content**: A 14x14 grid with uniform color (mid-tone green), consistent with the color bar\u2019s mid-range. ### Color Bar: - Labeled \"Cosine similarity,\" with a gradient from dark blue (low similarity, value 1) to yellow (high similarity, value 1). ### Figure Caption: \"Figure 1",
+  "11": "This figure consists of two side-by-side scatter plots, each with a title and labeled axes. **Left Panel (ViT-L/16):** - Title: \"ViT-L/16\" - X-axis: \"Network depth (layer)\" with tick marks at 0, 5, 10, 15, 20. - Y-axis: \"Mean attention distance (pixels)\" with tick marks at 0, 20, 40, 60, 80, 100, 120. - Legend: \"Head 1\" (blue dot), \"Head 2\" (orange dot), \"Head 3\" (green dot), \"...\" (gray dot). - Data: Each dot represents the mean attention distance for one of 16 heads at a specific network layer (0 to 20). Dots are scattered across the plot, with some clustering and variation in y-values (mean attention distance) across layers and heads. **Right Panel (R50x1 + ViT-L/16):** - Title: \"R50x1 + ViT-L/16\" - X-axis: \"Network depth (layer)\" with tick marks at 0, 5, 10, 15, 20. - Y-axis: \"Mean attention distance (pixels)\" with tick marks at 0, 20, 40, 60, 80, 100, 120. - Legend: \"Head 1\" (blue dot), \"Head 2\" (orange dot), \"Head 3\" (green dot), \"...\" (gray dot). - Data: Similar to the left panel, with dots representing mean attention distance for 16 heads across layers 0 to 20. The distribution of dots appears more spread out vertically compared to the left panel, but specific values are not numerically labeled. **Figure Caption (below the panels):** - \"Figure 11: Size of attended area by head and network depth. Attention",
+  "12": "This figure consists of two panels (left and right) with a caption below. **Left Panel**: A line graph with the x-axis labeled \"Input size [px]\" showing values 64, 128, 224, 384, 512. The y-axis is labeled \"Peak inference speed [img/sec/core]\" with tick marks at 10\u00b2, 10\u00b3, 10\u2074. Six lines represent different architectures: - Black solid line: R50x1 - Blue solid line: ViT-B/32 - Pink solid line: ViT-B/16 - Brown solid line: ViT-H/14 - Dotted black line: R50x2 - Dotted blue line: ViT-L/32 - Dotted pink line: ViT-L/16 - Black dashed line: R152x4 All lines show a downward trend as input size increases, with speeds decreasing from left (64px) to right (512px). **Right Panel**: A line graph with the x-axis labeled \"Input size [px]\" showing values 64, 128, 224, 384, 512. The y-axis is labeled \"Largest per-core batch-size\" with tick marks at 10\u00b2, 10\u00b3, 10\u2074. The same six architectures are plotted: - Black solid line: R50x1 - Blue solid line: ViT-B/32 - Pink solid line: ViT-B/16 - Brown solid line: ViT-H/14 - Dotted black line: R50x2 - Dotted blue line: ViT-L/32 - Dotted pink line: ViT-L/16 - Black dashed line: R152x4 All lines show a downward trend as input size increases, with batch sizes decreasing from left (64px) to right (512px). **Caption**: \"Figure 12",
+  "13": "This figure consists of two scatter plots side by side, each with a title and axis labels. ### Left Panel: - **Title**: \"ImageNet 5-shot linear top-1 accuracy\" (y-axis label). - **X-axis**: \"Total compute [exaFLOPs]\" (log scale, ranging from \\(10^2\\) to \\(10^3\\)). - **Data points**: Six models are plotted: - AxialViT-B/16 (blue circle, top-left). - AxialViT-B/32 (orange circle, middle-left). - ViT-B/16 (green circle, middle-left, slightly below AxialViT-B/16). - ViT-B/32 (orange circle, middle-left, below AxialViT-B/32). - ResNet50 (purple diamond, bottom-left). - AxialResNet50 (brown circle, bottom-left, above ResNet50). - **Y-axis values**: Ranges from 0.500 to 0.650, with tick marks at 0.500, 0.525, 0.550, 0.575, 0.600, 0.625, 0.650. ### Right Panel: - **Title**: \"ImageNet 5-shot linear top-1 accuracy\" (y-axis label). - **X-axis**: \"Peak inference speed [img/sec/core]\" (log scale, ranging from \\(10^2\\) to \\(10^3\\)). - **Data points**: Same six models as the left panel, plotted in the same positions relative to each other. - **Y-axis values**: Same as the left panel (0.500 to 0.650, tick marks at 0.500, 0.525, 0.550, 0.575, 0.600, 0.62",
+  "14": "This is a grid of small square images, arranged in 12 rows and 12 columns, totaling 144 images. Each image is labeled with a number in the top-left corner, ranging from 17 to 128 (note: the first row starts at 17, not 1). The images appear to be diverse, including scenes of buildings, animals (e.g., cats, dogs, birds), objects (e.g., food, tools, vehicles), and natural elements (e.g., plants, flowers, landscapes). The grid has no visible axes or explicit labels for rows or columns beyond the numerical labels on each image. The main structure is a random selection of attention maps, as indicated by the caption below the grid: \"Figure 14: Further example attention maps as in Figure 6 (random selection).\" There are no other visible labels, values, or trends beyond the image numbers and the caption."
+ },
+ "data": ""
+}
