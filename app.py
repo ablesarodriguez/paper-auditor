@@ -37,20 +37,56 @@ MODEL_NAMES = {"ultra": "Nemotron 3 Ultra", "super": "Nemotron 3 Super", "nano":
                "vision": "MiniCPM-V"}
 _usage_lock = threading.Lock()
 
-INTRO = """# Paper Reproducibility Auditor
+REPO = "https://github.com/ablesarodriguez/paper-auditor"
 
-Give it a scientific paper. It reads it as a referee does (are the numbers consistent, what is
-unsound or missing, can it be reproduced, how it stands against related work) and then re-implements
-and runs the results that can be recomputed, comparing them with what the paper reports. Every
-conclusion says how far it can be trusted.
-
-An arXiv id is the better input when the paper has one: the LaTeX source keeps equations and
-tables exact. A PDF is transcribed page by page first, which takes longer and can misread a digit.
+HERO = f"""
+<div class="hero">
+  <div class="hero-kicker">Nebius × NVIDIA Global AI Hackathon</div>
+  <h1>Paper Reproducibility Auditor</h1>
+  <p class="hero-lead">An AI referee for scientific papers. Give it an arXiv id or a PDF: it checks that the
+  numbers agree, challenges its own criticism, and re-runs the results that can be recomputed.</p>
+  <div class="pills">
+    <span>✓ Checks the numbers</span><span>✓ Every criticism quotes the paper</span>
+    <span>✓ Re-runs the results</span>
+  </div>
+  <div class="hero-tech">NVIDIA Nemotron 3 · MiniCPM-V · Tavily · on Nebius Token Factory ·
+  <a href="{REPO}" target="_blank">Code on GitHub (MIT)</a></div>
+</div>
 """
 
-DEMO_NOTE = f"""**Public demo.** The example reports below open at once. A new paper gets the review (about a
-minute); the full re-computation is shown on the examples. New papers are limited to {NEW_PER_DAY} a day
-and PDFs to {MAX_PAGES} pages, to keep the demo running for everyone."""
+DEMO_NOTE = (f"<div class='note'><b>Public demo.</b> The example reports open at once and cost nothing. A new "
+             f"paper gets the review (about a minute); the full re-computation is shown on the examples. New "
+             f"papers are limited to {NEW_PER_DAY} a day and PDFs to {MAX_PAGES} pages, so the demo keeps "
+             f"running for everyone.</div>")
+
+HOW = """
+### Models propose, code checks
+
+| Step | What happens | Done by |
+| --- | --- | --- |
+| Read | The LaTeX source from arXiv, or the PDF transcribed page by page; figures described from their images | MiniCPM-V |
+| Review | Summary, strengths, concerns, reproducibility checklist, questions. Every concern must quote the paper | Nemotron 3 Ultra |
+| Challenge | Each concern is argued against; it stays only if no passage answers it and a second model agrees | Ultra, then Super |
+| Check the numbers | Averages and totals in tables, percentages and their counts, the abstract's numbers against the body | Code |
+| Related work | Web search for the closest papers, and whether the paper cites them | Tavily + Ultra |
+| Re-run the results | Scripts written from the paper's equations, run, and compared with its tables | Nemotron 3 Super / Ultra |
+| Verdicts | Tolerances, sensitivity to missing details, confidence: fixed rules, never a model's opinion | Code |
+
+Every model call goes, in real time, to **Nebius Token Factory**.
+
+### Does it work?
+
+Errors were planted in copies of eleven real papers: 133 planted, **132 caught**. On the unmodified papers
+the only two flags are real problems of those papers (an abstract result printed differently in the body, and
+abstract figures read only off a plot). The full evaluation and its limits are in the repository.
+"""
+
+
+def finding_html(text: str) -> str:
+    """A key finding (markdown with **bold**) as safe HTML for a card."""
+    import html as markup
+    safe = markup.escape(text)
+    return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", safe).replace("`", "")
 
 
 def spent() -> float:
@@ -116,23 +152,28 @@ def open_folder(run: Path | None):
         [str(run / "report.md"), str(run / "audit.json")]
 
 
-# Shown first: one example of each thing the auditor does well, with what it found.
-FEATURED = [("1706.03762", "Attention Is All You Need"),
-            ("2504.00560", "A variational symplectic scheme based on Lobatto's quadrature"),
-            ("1412.6980", "Adam: A Method for Stochastic Optimization")]
+# Shown first: one example of each thing the auditor does well, said for someone who has not read the
+# report (each sentence restates the report's own first key finding, in plain words).
+FEATURED = [
+    ("1706.03762", "Attention Is All You Need", "Numbers that disagree",
+     "The abstract gives 41.8 BLEU for English–French; the results section says 41.0. Found by code, "
+     "confirmed by a second model."),
+    ("2504.00560", "A variational symplectic scheme based on Lobatto's quadrature", "Results re-run",
+     "All 8 results re-computed by code written from the paper's equations. Two hold only for a mass the "
+     "paper never states."),
+    ("1412.6980", "Adam: A Method for Stochastic Optimization", "A referee's concern",
+     "The convergence theorem assumes a decaying learning rate and momentum; the algorithm as written uses "
+     "constants."),
+]
 
 
-def featured() -> list[tuple[str, str, Path]]:
-    """(title, headline finding, folder) of the featured examples that are available."""
-    from auditor.report import key_findings
+def featured() -> list[tuple[str, str, str, Path]]:
+    """(title, tag, sentence, folder) of the featured examples that are available."""
     shown = []
-    for name, title in FEATURED:
+    for name, title, tag, sentence in FEATURED:
         folder = next((f for f in (ROOT / "examples" / name, ROOT / "runs" / name) if (f / "audit.json").exists()), None)
-        if not folder:
-            continue
-        audit = json.loads((folder / "audit.json").read_text(encoding="utf-8"))
-        points = [line[2:] for line in key_findings(audit) if line.startswith("- ")]
-        shown.append((title, points[0] if points else "", folder))
+        if folder:
+            shown.append((title, tag, sentence, folder))
     return shown
 
 
@@ -214,52 +255,107 @@ def audit(pdf, arxiv_id, max_claims, data=None, review_only=False, session_count
     yield "\n".join(log[-400:]), report.read_text(encoding="utf-8"), [str(report), str(run / "audit.json")], session_count
 
 
-# Report tables: a number or a short label is never split across lines ("41." over "0").
-CSS = ".prose table td, .prose table th { word-break: normal; overflow-wrap: normal; }"
+THEME = gr.themes.Soft(primary_hue="orange", secondary_hue="slate", neutral_hue="slate",
+                       font=[gr.themes.GoogleFont("Inter"), "system-ui", "sans-serif"],
+                       font_mono=[gr.themes.GoogleFont("JetBrains Mono"), "monospace"]).set(
+    body_background_fill="#f1f5f9", block_radius="14px", button_large_radius="10px")
 
-with gr.Blocks(title="Paper Reproducibility Auditor", css=CSS) as page:
-    gr.Markdown(INTRO)
+CSS = """
+.gradio-container { max-width: 1180px !important; margin: 0 auto !important; }
+.hero { background: radial-gradient(circle at 15% 20%, #1e3a8a 0%, #0f172a 55%); color: #fff; border-radius: 18px;
+        padding: 40px 44px 34px; border-left: 8px solid #f97316; }
+.hero h1 { color: #fff; font-size: 2.6rem; font-weight: 800; margin: 6px 0 10px; letter-spacing: -0.02em; }
+.hero-kicker { color: #fdba74; font-size: .85rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.hero-lead { color: #e2e8f0; font-size: 1.15rem; max-width: 820px; line-height: 1.6; margin: 0 0 18px; }
+.pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.pills span { background: rgba(249,115,22,.15); color: #fed7aa; border: 1px solid rgba(249,115,22,.5);
+              padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: .92rem; }
+.hero-tech { color: #94a3b8; font-size: .9rem; } .hero-tech a { color: #fdba74; }
+.note { background: #fff7ed; border: 1px solid #fed7aa; color: #7c2d12; padding: 12px 16px; border-radius: 12px; }
+.card { background: #fff !important; border: 1px solid #e2e8f0 !important; border-radius: 16px !important;
+        padding: 22px !important; box-shadow: 0 1px 3px rgba(15,23,42,.06); border-top: 5px solid #f97316 !important;
+        justify-content: space-between; }
+.card button { margin-top: auto; }
+.card .tag { color: #f97316; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.card h3 { margin: 6px 0 10px; font-size: 1.15rem; line-height: 1.35; color: #0f172a; }
+.card p { color: #334155; font-size: .95rem; line-height: 1.55; }
+.report-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 8px 34px 26px;
+              box-shadow: 0 1px 3px rgba(15,23,42,.06); }
+.report-box h1 { font-size: 1.9rem; border-bottom: 3px solid #f97316; padding-bottom: 10px; }
+.report-box h2 { margin-top: 1.8em; color: #0f172a; }
+.report-box table { font-size: .9rem; border-collapse: collapse; width: 100%; }
+.report-box th { background: #f1f5f9; }
+.report-box tr:nth-child(even) td { background: #f8fafc; }
+.report-box td, .report-box th { word-break: normal; overflow-wrap: normal; padding: 8px 10px; }
+.report-box blockquote { border-left: 4px solid #f97316; background: #fff7ed; padding: 8px 14px; color: #431407; }
+.report-box details { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 12px; margin: 10px 0; }
+.report-box summary { cursor: pointer; font-weight: 600; color: #c2410c; }
+.empty-report { color: #64748b; text-align: center; padding: 40px 0; }
+footer { display: none !important; }
+"""
+
+# after a report opens, bring it into view
+TO_REPORT = "() => { setTimeout(() => document.getElementById('report')?.scrollIntoView({behavior: 'smooth'}), 400); }"
+
+with gr.Blocks(title="Paper Reproducibility Auditor") as page:
+    gr.HTML(HERO)
     if DEMO:
-        gr.Markdown(DEMO_NOTE)
+        gr.HTML(DEMO_NOTE)
     session_count = gr.State(0)
-    highlights = featured()
-    if highlights:
-        gr.Markdown("### What it found\nReports made earlier. They open at once; nothing is run.")
     featured_buttons = []
-    for title, finding, folder in highlights:
-        with gr.Row(equal_height=True):
-            gr.Markdown(f"**{title}**  \n{finding}")
-            featured_buttons.append((gr.Button("Open report", scale=0, min_width=140), folder))
-    with gr.Row():
-        choice = gr.Dropdown(choices=list(examples()), label="All example reports")
-        open_example = gr.Button("Open this report")
-    with gr.Row():
-        pdf = gr.File(label="Paper (PDF)", file_types=[".pdf"], type="filepath")
-        with gr.Column():
-            arxiv_id = gr.Textbox(label="or an arXiv id", placeholder="2504.00560")
-            max_claims = gr.Slider(4, 30, value=20, step=1, label="Most claims to audit",
-                                   info="Every claim found is audited, up to this many. More claims take longer and cost more.")
-            review_only = gr.Checkbox(label="Review only", value=DEMO, interactive=not DEMO,
-                                      info="Read the paper as a referee (concerns, checklist, related work, figures) "
-                                           "without re-computing its results. About a minute.")
-            start = gr.Button("Audit this paper", variant="primary")
-    data = gr.File(label="Data the paper's results were computed from (optional): test images, tables, measurements",
-                   file_count="multiple", type="filepath", visible=not DEMO)
-    if not DEMO:
-        gr.Markdown("Without the data, results that depend on it cannot be checked: the method is still rebuilt from "
-                    "the paper and run on substitute data, which tests how it behaves, not the numbers the paper "
-                    "reports. Keep the file names the paper uses.")
-    progress = gr.Textbox(label="Progress", lines=4, max_lines=14, autoscroll=True)
-    report = gr.Markdown(label="Audit report")
-    files = gr.File(label="Download the report and the full audit data", file_count="multiple")
-    open_example.click(show, inputs=[choice], outputs=[progress, report, files])
+    with gr.Tabs():
+        with gr.Tab("Examples"):
+            gr.Markdown("### What it found\nReports made earlier on well-known papers. They open at once; nothing is run.")
+            with gr.Row(equal_height=True):
+                for title, tag, sentence, folder in featured():
+                    with gr.Column(elem_classes="card"):
+                        gr.HTML(f"<div class='tag'>{tag}</div><h3>{title}</h3><p>{finding_html(sentence)}</p>")
+                        featured_buttons.append((gr.Button("Open report", variant="primary", size="md"), folder))
+            with gr.Row():
+                choice = gr.Dropdown(choices=list(examples()), value=None, label="All example reports", scale=4)
+                open_example = gr.Button("Open this report", scale=1)
+        with gr.Tab("Audit a paper"):
+            with gr.Row():
+                with gr.Column(scale=3):
+                    arxiv_id = gr.Textbox(label="arXiv id", placeholder="e.g. 1706.03762",
+                                          info="The better input: the LaTeX source keeps equations and tables exact.")
+                    pdf = gr.File(label="or a PDF", file_types=[".pdf"], type="filepath", height=140)
+                    review_only = gr.Checkbox(label="Review only", value=DEMO, interactive=not DEMO,
+                                              info="The referee's reading (concerns, number checks, checklist, related "
+                                                   "work, figures) without re-computing results. About a minute.")
+                    with gr.Accordion("Options", open=False, visible=not DEMO):
+                        max_claims = gr.Slider(4, 30, value=20, step=1, label="Most claims to re-compute",
+                                               info="More claims take longer and cost more.")
+                        data = gr.File(label="The paper's data (optional): test images, tables, measurements",
+                                       file_count="multiple", type="filepath")
+                        gr.Markdown("Without the data, results that depend on it cannot be checked: the method is "
+                                    "rebuilt and run on substitute data. Keep the file names the paper uses.")
+                    start = gr.Button("Audit this paper", variant="primary", size="lg")
+                with gr.Column(scale=2):
+                    gr.Markdown("#### What you get\n"
+                                "- **Key findings** first: what disagrees, what is unsupported, what was reproduced\n"
+                                "- **Number checks** done by code, never by a model\n"
+                                "- **Concerns**, each quoting the paper, and those withdrawn after a challenge\n"
+                                "- **Reproducibility checklist** and questions for the authors\n"
+                                "- **Related work** found on the web, cited or not\n"
+                                "- For computational papers: the **scripts** that re-ran the results")
+        with gr.Tab("How it works"):
+            gr.Markdown(HOW)
+    progress = gr.Textbox(label="Progress", lines=3, max_lines=12, autoscroll=True,
+                          placeholder="Open an example or audit a paper: what happens shows up here.")
+    with gr.Column(elem_id="report", elem_classes="report-box"):
+        report = gr.Markdown("<div class='empty-report'>The report will appear here.</div>")
+        with gr.Accordion("Download the report and the full audit data", open=False):
+            files = gr.File(show_label=False, file_count="multiple", height=90)
+    open_example.click(show, inputs=[choice], outputs=[progress, report, files], js=TO_REPORT)
     for button, folder in featured_buttons:
-        button.click(lambda folder=folder: open_folder(folder), outputs=[progress, report, files])
+        button.click(lambda folder=folder: open_folder(folder), outputs=[progress, report, files], js=TO_REPORT)
     start.click(audit, inputs=[pdf, arxiv_id, max_claims, data, review_only, session_count],
-                outputs=[progress, report, files, session_count])
+                outputs=[progress, report, files, session_count], js=TO_REPORT)
 
 if __name__ == "__main__":
     # One audit at a time: they share the budget and the machine.
     # PORT is how hosting services (Render) say where to listen
     port = int(os.getenv("PORT") or os.getenv("GRADIO_SERVER_PORT", "7860"))
-    page.queue(default_concurrency_limit=1).launch(server_name=os.getenv("HOST", "127.0.0.1"), server_port=port)
+    page.queue(default_concurrency_limit=1).launch(server_name=os.getenv("HOST", "127.0.0.1"), server_port=port,
+                                                   theme=THEME, css=CSS)
