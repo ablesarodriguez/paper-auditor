@@ -9,6 +9,10 @@ each conclusion can be trusted.
 
 Built for the Nebius x NVIDIA Global AI Hackathon.
 
+**Live demo: https://paper-auditor.onrender.com** (free instance: the first visit after a quiet
+spell takes about a minute to wake it up). The example reports open at once; a new paper gets
+the review.
+
 ## How it works
 
 ```
