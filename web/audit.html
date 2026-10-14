@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auditing — Paper Auditor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div><a class="wordmark" href="/">Paper Auditor<span class="dot">.</span></a>
+      <span class="tagline smallcaps">Referee reports for scientific papers</span></div>
+    <nav><a href="/#reports">Reports</a><a href="/#how">How it works</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="run-head">
+    <div class="kicker smallcaps" style="color: var(--red)">Audit in progress</div>
+    <h1 id="title">Starting…</h1>
+    <div class="status" id="status"><span class="pulse"></span><span id="status-text">Reading the paper</span></div>
+  </div>
+  <ol class="runlog" id="log"></ol>
+</main>
+
+<script src="/static/site.js"></script>
+<script>
+const job = location.pathname.split("/").pop();
+const log = document.getElementById("log");
+let seen = 0;
+
+function kind(line) {
+  if (/^\d\/\d |^review|^related|^figures/i.test(line) || /\(\+\d+ s\)$/.test(line)) return "stage";
+  if (/via Nebius Token Factory/.test(line)) return "call";
+  if (/did not finish|error|Traceback/i.test(line)) return "bad";
+  if (/concerns tied|cross-checks|related works|figures described|characters \(/.test(line)) return "result";
+  return "";
+}
+
+async function poll() {
+  let state;
+  try {
+    state = await api(`/api/jobs/${job}?since=${seen}`);
+  } catch (e) {
+    document.getElementById("title").textContent = e.message;
+    document.getElementById("status").hidden = true;
+    return;
+  }
+  document.getElementById("title").textContent = `Auditing ${state.source}`;
+  document.title = `Auditing ${state.source} — Paper Auditor`;
+  for (const line of state.log) {
+    const li = document.createElement("li");
+    li.className = kind(line.trim());
+    li.textContent = line.trim();
+    log.appendChild(li);
+  }
+  seen = state.total;
+  if (state.log.length) window.scrollTo({top: document.body.scrollHeight, behavior: "smooth"});
+  const minutes = Math.floor(state.elapsed / 60), seconds = String(state.elapsed % 60).padStart(2, "0");
+  if (!state.done) {
+    document.getElementById("status-text").textContent = `Working · ${minutes}:${seconds} · each line below is a step or a model call`;
+    setTimeout(poll, 1200);
+  } else if (state.ok) {
+    document.getElementById("status").classList.add("done");
+    document.getElementById("status-text").textContent = "Report ready — opening it…";
+    setTimeout(() => location.href = `/report/${encodeURIComponent(state.name)}`, 1200);
+  } else {
+    document.getElementById("status").hidden = true;
+    const li = document.createElement("li");
+    li.className = "bad"; li.textContent = state.error;
+    log.appendChild(li);
+  }
+}
+poll();
+</script>
+</body>
+</html>

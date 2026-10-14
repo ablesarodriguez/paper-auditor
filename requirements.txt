@@ -8,5 +8,8 @@ sympy
 matplotlib
 pymupdf
 json-repair
-gradio
 pillow
+fastapi
+uvicorn
+python-multipart
+markdown

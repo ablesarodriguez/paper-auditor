@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paper Auditor — referee reports for scientific papers</title>
+<meta name="description" content="An AI referee for scientific papers: it checks that the numbers agree, challenges its own criticism, and re-runs the results that can be recomputed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div><a class="wordmark" href="/">Paper Auditor<span class="dot">.</span></a>
+      <span class="tagline smallcaps">Referee reports for scientific papers</span></div>
+    <nav><a href="#reports">Reports</a><a href="#how">How it works</a><a id="repo-link" href="#">Code</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="opening">
+    <div>
+      <div class="kicker smallcaps">An AI referee, checked by code</div>
+      <h1>Every number checked. Every claim questioned. <em>Every result re-run.</em></h1>
+      <p class="lede">Peer review rarely has time to check every number or re-run every result, so mistakes
+        get through. Give this auditor a paper: it reads it the way a referee does, argues against its own
+        criticism before keeping it, does the arithmetic in code, and rebuilds the computations from the
+        paper's equations.</p>
+    </div>
+
+    <form class="submit" id="audit-form" novalidate>
+      <h2>Audit a paper</h2>
+      <p class="hint">An arXiv identifier is best: the LaTeX source keeps equations and tables exact.</p>
+      <label class="field-label" for="arxiv">arXiv identifier</label>
+      <div class="inputrow">
+        <input id="arxiv" name="arxiv_id" placeholder="1706.03762" autocomplete="off" spellcheck="false">
+        <button type="submit" id="go">Audit</button>
+      </div>
+      <p class="alt">or <label for="pdf">upload a PDF</label><input type="file" id="pdf" accept=".pdf,application/pdf">
+        <span class="filename" id="filename"></span></p>
+      <label class="check" id="review-row"><input type="checkbox" id="review-only" checked>
+        <span>Review only — the referee's reading, without re-running the results. About a minute.</span></label>
+      <p class="formerror" id="form-error" hidden></p>
+      <p class="fineprint" id="demo-note" hidden></p>
+    </form>
+  </section>
+
+  <section class="block" id="reports">
+    <div class="section-head"><h2>From the reports</h2><p>Made earlier. They open at once; nothing is run.</p></div>
+    <div class="featured" id="featured"></div>
+  </section>
+
+  <section class="block">
+    <div class="section-head"><h2>All reports</h2><p id="count"></p></div>
+    <ol class="toc-list" id="all"></ol>
+  </section>
+
+  <section class="block" id="how">
+    <div class="section-head"><h2>How it works</h2><p>Models propose; code checks.</p></div>
+    <div class="steps">
+      <div class="step"><div><h3>Reads the paper</h3>
+        <p>The LaTeX source from arXiv, or the PDF transcribed page by page. Figures are described from their images.</p>
+        <div class="by">Done by <b>MiniCPM-V</b></div></div></div>
+      <div class="step"><div><h3>Checks the numbers</h3>
+        <p>Averages and totals in tables, percentages against their counts, the abstract's figures against the body.</p>
+        <div class="by code">Done by <b>code</b>, never a model</div></div></div>
+      <div class="step"><div><h3>Writes a referee report</h3>
+        <p>Summary, concerns, a reproducibility checklist and questions. Every concern must quote the paper.</p>
+        <div class="by">Done by <b>Nemotron 3 Ultra</b></div></div></div>
+      <div class="step"><div><h3>Finds related work</h3>
+        <p>Searches the web for the closest papers, and checks whether the paper cites them.</p>
+        <div class="by">Done by <b>Tavily</b> and <b>Nemotron 3 Ultra</b></div></div></div>
+      <div class="step"><div><h3>Argues against itself</h3>
+        <p>Each concern is challenged. It stays only if no passage of the paper answers it, and a second model agrees.</p>
+        <div class="by">Done by <b>Nemotron 3 Ultra</b>, then <b>Super</b></div></div></div>
+      <div class="step"><div><h3>Re-runs the results</h3>
+        <p>For computational papers: scripts written from the equations are run and compared with the paper's tables.</p>
+        <div class="by">Done by <b>Nemotron 3 Super</b>; verdicts by <b>code</b></div></div></div>
+    </div>
+    <div class="figures">
+      <div><div class="n">132<small>&thinsp;/&thinsp;133</small></div>
+        <div class="l">errors planted in copies of eleven real papers were caught by the checks.</div></div>
+      <div><div class="n">2</div>
+        <div class="l">flags raised on the unmodified papers — both real problems of those papers.</div></div>
+      <div><div class="n">8<small>&thinsp;/&thinsp;8</small></div>
+        <div class="l">results of a numerical-methods paper re-computed from its equations.</div></div>
+    </div>
+  </section>
+</main>
+
+<footer class="colophon">
+  <div class="wrap">
+    <span>Every model call goes, in real time, to NVIDIA Nemotron on Nebius Token Factory. Related work through Tavily.</span>
+    <span>Open source, MIT · <a id="repo-link-2" href="#">GitHub</a></span>
+  </div>
+</footer>
+
+<script src="/static/site.js"></script>
+<script>
+(async () => {
+  const cfg = await api("/api/config");
+  for (const id of ["repo-link", "repo-link-2"]) document.getElementById(id).href = cfg.repo;
+  if (cfg.demo) {
+    const note = document.getElementById("demo-note");
+    note.hidden = false;
+    note.textContent = `Public demo: a new paper gets the review, about a minute; the full re-computation is shown in the reports below. Up to ${cfg.per_day} new papers a day, PDFs up to ${cfg.max_pages} pages.`;
+    document.getElementById("review-row").hidden = true;
+  }
+
+  const data = await api("/api/reports");
+  const meta = r => [r.kind,
+    r.mismatches ? `<span class="flag">${r.mismatches > 1 ? `${r.mismatches} numbers disagree` : "1 number disagrees"}</span>` : null,
+    r.claims ? `${r.reproduced} of ${r.claims} results reproduced` : null,
+    r.concerns ? `${r.concerns} concern${r.concerns > 1 ? "s" : ""}` : null].filter(Boolean).join(" · ");
+  document.getElementById("featured").innerHTML = data.featured.map(r => `
+    <article>
+      <div class="tag smallcaps">${esc(r.tag)}</div>
+      <h3><a href="/report/${encodeURIComponent(r.name)}">${esc(r.title)}</a></h3>
+      <p>${esc(r.sentence)}</p>
+      <div class="meta">${meta(r)}</div>
+      <div><a class="readmore" href="/report/${encodeURIComponent(r.name)}">Read the report</a></div>
+    </article>`).join("");
+  document.getElementById("all").innerHTML = data.all.map(r => `
+    <li><a href="/report/${encodeURIComponent(r.name)}">
+      <span class="t">${esc(r.title)}</span><span class="m">${meta(r)}</span><span class="arrow">→</span></a></li>`).join("");
+  document.getElementById("count").textContent = `${data.all.length} papers`;
+})();
+
+const pdf = document.getElementById("pdf");
+pdf.addEventListener("change", () => {
+  document.getElementById("filename").textContent = pdf.files[0] ? pdf.files[0].name : "";
+  if (pdf.files[0]) document.getElementById("arxiv").value = "";
+});
+
+document.getElementById("audit-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const error = document.getElementById("form-error"), go = document.getElementById("go");
+  error.hidden = true;
+  const form = new FormData();
+  form.append("arxiv_id", document.getElementById("arxiv").value.trim());
+  form.append("review_only", document.getElementById("review-only").checked);
+  if (pdf.files[0]) form.append("pdf", pdf.files[0]);
+  go.disabled = true; go.textContent = "Starting…";
+  try {
+    const started = await api("/api/audit", {method: "POST", body: form});
+    location.href = started.report ? `/report/${encodeURIComponent(started.report)}` : `/audit/${started.job}`;
+  } catch (e) {
+    error.textContent = e.message; error.hidden = false;
+    go.disabled = false; go.textContent = "Audit";
+  }
+});
+</script>
+</body>
+</html>

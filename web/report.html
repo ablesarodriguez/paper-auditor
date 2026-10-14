@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report — Paper Auditor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div><a class="wordmark" href="/">Paper Auditor<span class="dot">.</span></a>
+      <span class="tagline smallcaps">Referee reports for scientific papers</span></div>
+    <nav><a href="/#reports">Reports</a><a href="/#how">How it works</a><a href="/">Audit a paper</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="report-head">
+    <div class="crumbs"><a href="/#reports">Reports</a> / <span id="crumb"></span></div>
+    <div class="kicker smallcaps" id="kind"></div>
+    <h1 id="title">Loading the report…</h1>
+    <div class="meta" id="meta"></div>
+  </div>
+  <div class="report-layout">
+    <aside class="contents"><div class="smallcaps">Contents</div><ol id="contents"></ol></aside>
+    <article class="doc" id="doc"></article>
+  </div>
+</main>
+
+<script src="/static/site.js"></script>
+<script>
+(async () => {
+  const name = decodeURIComponent(location.pathname.split("/").pop());
+  let report;
+  try {
+    report = await api(`/api/reports/${encodeURIComponent(name)}`);
+  } catch (e) {
+    document.getElementById("title").textContent = "No report by that name.";
+    document.getElementById("doc").innerHTML = `<p><a href="/">Back to the reports</a></p>`;
+    return;
+  }
+  document.title = `${report.title} — Paper Auditor`;
+  document.getElementById("title").textContent = report.title;
+  document.getElementById("crumb").textContent = report.title;
+  document.getElementById("kind").textContent = report.kind === "Full audit"
+    ? "Full audit · review and re-computation" : "Referee review";
+  const arxiv = /^\d{4}\.\d{4,5}$/.test(report.name);
+  document.getElementById("meta").innerHTML = [
+    arxiv ? `<a href="https://arxiv.org/abs/${esc(report.name)}" target="_blank" rel="noopener">arXiv:${esc(report.name)}</a>` : null,
+    report.checks ? `${report.checks} number checks${report.mismatches ? `, <span class="flag">${report.mismatches} ${report.mismatches > 1 ? "disagree" : "disagrees"}</span>` : ", all agree"}` : null,
+    report.claims ? `${report.reproduced} of ${report.claims} results reproduced` : null,
+    `<a href="/api/reports/${encodeURIComponent(report.name)}/files/report.md">Download report</a>`,
+    `<a href="/api/reports/${encodeURIComponent(report.name)}/files/audit.json">Full audit data (JSON)</a>`,
+  ].filter(Boolean).join("<span aria-hidden='true'>·</span>");
+
+  const doc = document.getElementById("doc");
+  doc.innerHTML = DOMPurify.sanitize(marked.parse(report.markdown, {gfm: true}), {ADD_TAGS: ["details", "summary"]});
+
+  // number checks: the row of a mismatch in red, an agreement marked as such
+  for (const row of doc.querySelectorAll("tbody tr")) {
+    const first = row.cells[0] && row.cells[0].textContent.trim();
+    if (first === "✗") row.classList.add("mismatch");
+    if (first === "✓") row.cells[0].classList.add("okmark");
+  }
+
+  // the key findings, set apart as a reader would mark them
+  const findings = [...doc.querySelectorAll("h2")].find(h => h.textContent.trim() === "Key findings");
+  if (findings) {
+    const box = document.createElement("div");
+    box.className = "findings";
+    findings.before(box);
+    let node = findings;
+    while (node && !(node !== findings && /^H[12]$/.test(node.tagName))) {
+      const next = node.nextElementSibling;
+      box.appendChild(node);
+      node = next;
+    }
+  }
+
+  // contents, from the headings; the part of a full audit that re-runs results starts a new group
+  const contents = document.getElementById("contents");
+  const headings = [...doc.querySelectorAll("h1, h2")].filter((h, i) => !(h.tagName === "H1" && h === doc.querySelector("h1")));
+  for (const h of headings) {
+    h.id = h.id || slug(h.textContent);
+    const li = document.createElement("li");
+    if (h.tagName === "H1") li.className = "part";
+    li.innerHTML = `<a href="#${h.id}">${esc(h.textContent.replace(/^Review of: .*/, "Review"))}</a>`;
+    contents.appendChild(li);
+  }
+  const links = new Map([...contents.querySelectorAll("a")].map(a => [a.getAttribute("href").slice(1), a]));
+  const watcher = new IntersectionObserver(entries => {
+    for (const entry of entries) if (entry.isIntersecting) {
+      links.forEach(a => a.classList.remove("active"));
+      links.get(entry.target.id)?.classList.add("active");
+    }
+  }, {rootMargin: "0px 0px -75% 0px"});
+  headings.forEach(h => watcher.observe(h));
+  if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+})();
+</script>
+</body>
+</html>
