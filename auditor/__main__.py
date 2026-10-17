@@ -11,8 +11,13 @@ import argparse
 import json
 import shutil
 import time
+import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
+for _k in ("TAVILY_API_KEY", "NEBIUS_API_KEY"):
+    if _k in os.environ:
+        os.environ[_k] = os.environ[_k].strip()
 
 from . import executor, llm, memo, verify
 from . import implement as implement_module

@@ -122,14 +122,15 @@ def year_of(url: str) -> int | None:
 def related_work(title: str, summary: str, paper: str, year: int | None = None) -> dict | None:
     """Return {"queries", "related": [{title, url, relation, note, cited, year}], "assessment", "paper_year"}, or
     None without a Tavily key. `year` is the paper's own, to tell later work from work it could have cited."""
-    if not os.getenv("TAVILY_API_KEY"):
+    tavily_key = (os.getenv("TAVILY_API_KEY") or "").strip()
+    if not tavily_key:
         return None
     from tavily import TavilyClient
 
     queries = chat_json("ultra", [{"role": "user", "content": QUERIES_PROMPT.format(
         n=MAX_QUERIES, title=title, summary=summary)}], key="queries", max_tokens=600, purpose="related")["queries"]
     queries = [q.strip() for q in queries if isinstance(q, str) and q.strip()][:MAX_QUERIES]
-    tavily = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
+    tavily = TavilyClient(api_key=tavily_key)
     found = {}
     for query in queries:
         print(f"  tavily: {query}", flush=True)

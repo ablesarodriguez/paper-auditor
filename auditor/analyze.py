@@ -147,7 +147,8 @@ def search_missing_details(title: str, claims: list[dict]) -> tuple[list[dict], 
     deferred = list(dict.fromkeys(t for c in claims for t in c.get("deferred_to", [])))[:MAX_SOURCES]
     if not missing and not deferred:
         return [], []
-    if not os.getenv("TAVILY_API_KEY"):
+    tavily_key = (os.getenv("TAVILY_API_KEY") or "").strip()
+    if not tavily_key:
         print("  TAVILY_API_KEY not set, skipping web search")
         return [], []
     from tavily import TavilyClient
@@ -160,7 +161,7 @@ def search_missing_details(title: str, claims: list[dict]) -> tuple[list[dict], 
             title=title, missing="\n".join(missing), n=MAX_QUERIES - len(queries))}], key="queries")["queries"]
         queries += [line.strip() for q in generated if isinstance(q, str)
                     for line in q.splitlines() if line.strip()][:MAX_QUERIES - len(queries)]
-    tavily = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
+    tavily = TavilyClient(api_key=tavily_key)
     searches, candidates = [], {}
     wanted, own = words(" ".join(deferred) or " ".join(missing)), words(title)
     for query in queries:

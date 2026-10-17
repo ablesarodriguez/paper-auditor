@@ -34,6 +34,9 @@ from auditor.ingest import ARXIV_ID
 ROOT = Path(__file__).parent
 WEB = ROOT / "web"
 load_dotenv(ROOT / ".env")
+for _k in ("TAVILY_API_KEY", "NEBIUS_API_KEY"):
+    if _k in os.environ:
+        os.environ[_k] = os.environ[_k].strip()
 
 DEMO = os.getenv("DEMO_MODE", "0") == "1"
 NEW_PER_DAY = int(os.getenv("DEMO_NEW_PER_DAY", "6"))         # new papers a day, all visitors together
@@ -154,6 +157,42 @@ def admit(session_count: int) -> str:
 
 # ---------------------------------------------------------------- audits
 
+TOKEN_PATTERNS = [
+    re.compile(r"tvly-[A-Za-z0-9_\-]+"),
+    re.compile(r"Bearer\s+([A-Za-z0-9_\-\.]+)", re.IGNORECASE),
+]
+TRACEBACK_INDICATORS = (
+    "Traceback (most recent call last)",
+    'File "<',
+    'File "/',
+    'File "C:\\',
+    "requests.exceptions",
+    "urllib3.exceptions",
+    "openai.",
+    "tavily.",
+    "InvalidHeader",
+    "HTTPError",
+    "ConnectionError",
+    "TimeoutError",
+)
+
+
+def redact_secrets(text: str) -> str:
+    """Scrub known API keys and token patterns from log output."""
+    for key, val in os.environ.items():
+        if any(term in key.upper() for term in ("KEY", "SECRET", "TOKEN", "AUTH", "PASS")) and len(val) >= 4:
+            text = text.replace(val, "[REDACTED]")
+    for pattern in TOKEN_PATTERNS:
+        text = pattern.sub(lambda m: "Bearer [REDACTED]" if m.group(0).lower().startswith("bearer") else "[REDACTED]", text)
+    return text
+
+
+def is_traceback_line(line: str) -> bool:
+    """Check if a line looks like an internal stack trace or exception dump."""
+    stripped = line.strip()
+    return any(indicator in stripped for indicator in TRACEBACK_INDICATORS)
+
+
 def readable(line: str) -> str:
     """A line of the auditor's log as the page shows it: a model call says which model, through what, at what cost."""
     call = MODEL_CALL.search(line)
@@ -169,19 +208,47 @@ def run_audit(job: dict, command: list[str]) -> None:
         job["log"].append("Waiting for the audit before this one to finish…")
     with _audit_lock:
         job["started"] = time.time()
-        process = subprocess.Popen(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
-                                   encoding="utf-8", errors="replace", env={**os.environ, "PYTHONIOENCODING": "utf-8"})
+        process = subprocess.Popen(
+            command,
+            cwd=ROOT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"}
+        )
+
+        stderr_lines = []
+
+        def capture_stderr():
+            for err_line in process.stderr:
+                stderr_lines.append(err_line)
+
+        err_thread = threading.Thread(target=capture_stderr, daemon=True)
+        err_thread.start()
+
         for line in process.stdout:
-            if line.strip():
-                job["log"].append(readable(line))
+            clean = line.strip()
+            if clean and not is_traceback_line(clean):
+                sanitized = redact_secrets(readable(clean))
+                job["log"].append(sanitized)
+
         process.wait()
+        err_thread.join(timeout=2)
+
+        if stderr_lines:
+            # Stderr is printed only to server console (Render dashboard logs), never exposed to web UI
+            sys.stderr.write(f"[Audit {job['name']} stderr]:\n" + redact_secrets("".join(stderr_lines)) + "\n")
+            sys.stderr.flush()
+
     run = ROOT / "runs" / job["name"]
     job["ok"] = process.returncode == 0 and (run / "report.md").exists()
     if job["ok"]:
         stats = json.loads((run / "stats.json").read_text(encoding="utf-8"))
         job["log"].append(f"Done in {stats['seconds']} s. Model calls cost ${sum(stats['cost_usd'].values()):.2f}.")
     else:
-        job["error"] = "The audit did not finish. The log above shows where it stopped."
+        job["error"] = "The audit did not finish. An error occurred while processing the paper."
     job["done"] = True
 
 

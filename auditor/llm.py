@@ -86,7 +86,7 @@ _ledger_lock = threading.Lock()
 def client() -> OpenAI:
     global _client
     if _client is None:
-        _client = OpenAI(base_url=BASE_URL, api_key=os.environ["NEBIUS_API_KEY"], timeout=900)
+        _client = OpenAI(base_url=BASE_URL, api_key=os.environ["NEBIUS_API_KEY"].strip(), timeout=900)
     return _client
 
 
